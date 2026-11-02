@@ -150,25 +150,30 @@
       }
     }
 
-    .btn-next {
-      padding: 14px 40px;
-      font-size: 18px;
-      background: linear-gradient(135deg, #0284c7, #3b82f6);
-      color: white;
-      border: none;
-      border-radius: 30px;
-      font-weight: bold;
+    /* MAŁE OKIENKO / PRZYCISK ROZWIJAJĄCY */
+    .toggle-dashboard-box {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 12px 24px;
+      border-radius: 8px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 15px;
+      font-weight: 600;
+      color: #38bdf8;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .btn-next:hover {
+    .toggle-dashboard-box:hover {
+      background: #334155;
+      border-color: #38bdf8;
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
     }
 
-    /* GŁÓWNE GUI QUIZÓW */
+    /* GŁÓWNE GUI QUIZÓW (UKRYTE DOMYŚLNIE) */
     #dashboard-screen {
       display: none;
       padding: 30px;
@@ -192,6 +197,23 @@
       margin-bottom: 20px;
       border-bottom: 2px solid #334155;
       padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-close-dashboard {
+      background: #475569;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn-close-dashboard:hover {
+      background: #64748b;
     }
 
     /* FORMULARZ TWORZENIA QUIZU */
@@ -312,20 +334,26 @@
       </div>
     </nav>
 
-    <!-- 1. POWITANIE Z PRZYCISKIEM PRZEJDŹ DALEJ -->
+    <!-- 1. POWITANIE Z MAŁYM OKIENKIEM ROZWIJAJĄCYM -->
     <div id="welcome-screen">
       <h1 class="welcome-text">
         Witaj na stronie rowneballer rozwiązuj swoje quizy i walcz o nagrody więcej o tym masz w zakładce info-konkurs
       </h1>
-      <button class="btn-next" id="go-to-dashboard-btn">Przejdź dalej ➔</button>
+      <!-- Małe okienko / przycisk -->
+      <div class="toggle-dashboard-box" id="open-dashboard-btn">
+        ⚡ Stwórz quiz i zarządzaj quizami
+      </div>
     </div>
 
-    <!-- 2. GŁÓWNE GUI QUIZÓW -->
+    <!-- 2. GŁÓWNE GUI QUIZÓW (PO KLIKNIĘCIU) -->
     <div id="dashboard-screen">
       
       <!-- TWÓRZ QUIZ -->
       <div class="section-card">
-        <h2 class="section-title">Stwórz własny Quiz</h2>
+        <h2 class="section-title">
+          Stwórz własny Quiz
+          <button class="btn-close-dashboard" id="close-dashboard-btn">Zamknij panel</button>
+        </h2>
         <form id="create-quiz-form" class="create-grid">
           
           <div class="form-group full-width">
@@ -391,7 +419,9 @@
     const nickForm = document.getElementById('nick-form');
     const userDisplayName = document.getElementById('user-display-name');
     const changeNickBtn = document.getElementById('change-nick-btn');
-    const goToDashboardBtn = document.getElementById('go-to-dashboard-btn');
+    
+    const openDashboardBtn = document.getElementById('open-dashboard-btn');
+    const closeDashboardBtn = document.getElementById('close-dashboard-btn');
     
     const createQuizForm = document.getElementById('create-quiz-form');
     const quizContainer = document.getElementById('quiz-container');
@@ -430,10 +460,15 @@
       renderQuizzes();
     }
 
-    // Nawigacja Przejdź Dalej
-    goToDashboardBtn.addEventListener('click', () => {
+    // Otwieranie i zamykanie panelu quizów
+    openDashboardBtn.addEventListener('click', () => {
       welcomeScreen.style.display = 'none';
       dashboardScreen.style.display = 'flex';
+    });
+
+    closeDashboardBtn.addEventListener('click', () => {
+      dashboardScreen.style.display = 'none';
+      welcomeScreen.style.display = 'flex';
     });
 
     changeNickBtn.addEventListener('click', () => {
