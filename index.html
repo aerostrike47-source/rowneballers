@@ -111,22 +111,6 @@
       color: #38bdf8;
     }
 
-    .btn-create-modal {
-      background: #10b981;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.2s;
-    }
-
-    .btn-create-modal:hover {
-      background: #059669;
-    }
-
     .btn-change-nick {
       background: #475569;
       padding: 6px 12px;
@@ -207,7 +191,7 @@
       border: 1px solid #334155;
     }
 
-    /* MODAL / OKIENKO TWORZENIA QUIZU */
+    /* MODAL / OKIENKO TWORZENIA/EDYCJI QUIZU */
     #modal-overlay {
       display: none;
       position: fixed;
@@ -328,6 +312,12 @@
       margin-bottom: 8px;
     }
 
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
     .btn-play {
       background: #10b981;
       color: white;
@@ -336,13 +326,30 @@
       border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 10px;
+      flex: 1;
       transition: background 0.2s;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .btn-play:hover {
       background: #059669;
+    }
+
+    .btn-edit {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      flex: 1;
+      transition: background 0.2s;
+      font-size: 13px;
+    }
+
+    .btn-edit:hover {
+      background: #2563eb;
     }
   </style>
 </head>
@@ -369,7 +376,6 @@
     <nav>
       <div class="logo">RówneBaller</div>
       <div class="nav-right">
-        <button class="btn-create-modal" id="open-modal-btn">+ Stwórz quiz</button>
         <span class="user-info">Cześć, <strong id="user-display-name">Gracz</strong>!</span>
         <button class="btn-change-nick" id="change-nick-btn">Zmień nick</button>
       </div>
@@ -387,7 +393,7 @@
     <div id="dashboard-screen">
       <div class="section-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-          <h2 class="section-title" style="margin-bottom: 0; border: none;">Nasze Quizy</h2>
+          <h2 class="section-title" style="margin-bottom: 0; border: none;">Nasze Quizy (Wszystkie edytowalne)</h2>
           <button class="btn" style="width: auto; padding: 8px 16px; background: #475569;" id="back-to-home-btn">← Powrót</button>
         </div>
         <div class="quiz-list" id="quiz-container">
@@ -397,25 +403,30 @@
     </div>
   </div>
 
-  <!-- MODAL / OKIENKO TWORZENIA QUIZU (MIN 5 PYTAŃ) -->
+  <!-- MODAL / OKIENKO EDYCJI QUIZU (MIN 5 PYTAŃ + HASŁO) -->
   <div id="modal-overlay">
     <div class="modal-content">
       <button class="btn-close-modal" id="close-modal-btn">&times;</button>
-      <h2 style="color: #38bdf8; margin-bottom: 10px;">Stwórz Quiz</h2>
-      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Twój quiz musi zawierać **minimum 5 pytań**.</p>
+      <h2 style="color: #38bdf8; margin-bottom: 5px;" id="modal-title">Edytuj Quiz</h2>
+      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Wymagane hasło (1234) oraz minimum 5 pytań.</p>
       
       <form id="create-quiz-form">
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label style="font-weight: bold; color: #38bdf8;">Hasło administratora</label>
+          <input type="password" id="admin-pass" placeholder="Wpisz hasło (1234)" required>
+        </div>
+
         <div class="form-group" style="margin-bottom: 20px;">
           <label style="font-weight: bold; color: #38bdf8;">Nazwa Quizu</label>
-          <input type="text" id="quiz-title" placeholder="np. Mój quiz piłkarski" required>
+          <input type="text" id="quiz-title" required>
         </div>
 
         <!-- Tutaj generują się pytania (min 5) -->
         <div id="questions-container"></div>
 
         <div style="display: flex; gap: 10px; margin-top: 20px;">
-          <button type="button" class="btn" id="add-question-btn" style="background: #334155; flex: 1;">+ Dodaj kolejne pytanie</button>
-          <button type="submit" class="btn" style="background: #10b981; flex: 1;">Zapisz Quiz (Minimum 5 pytań)</button>
+          <button type="button" class="btn" id="add-question-btn" style="background: #334155; flex: 1;">+ Dodaj pytanie</button>
+          <button type="submit" class="btn" style="background: #10b981; flex: 1;">Zapisz Zmiany</button>
         </div>
       </form>
     </div>
@@ -434,267 +445,17 @@
     const goToDashboardBtn = document.getElementById('go-to-dashboard-btn');
     const backToHomeBtn = document.getElementById('back-to-home-btn');
     
-    const openModalBtn = document.getElementById('open-modal-btn');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const modalOverlay = document.getElementById('modal-overlay');
+    const modalTitle = document.getElementById('modal-title');
     
     const createQuizForm = document.getElementById('create-quiz-form');
     const questionsContainer = document.getElementById('questions-container');
     const addQuestionBtn = document.getElementById('add-question-btn');
     const quizContainer = document.getElementById('quiz-container');
 
-    // 8 docelowych quizów piłkarskich
+    let currentEditingId = null;
+
+    // 8 docelowych quizów piłkarskich z domyślnym stanem
     let quizy = [
-      {
-        id: 1,
-        title: "1. Historia RówneBaller",
-        questions: [
-          { question: "W którym roku powstał kanał TikTok RówneBaller?", img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", options: ["2021", "2022", "2023", "2024"], correct: 2 }
-        ],
-        active: true,
-        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop"
-      },
-      {
-        id: 2,
-        title: "2. Złota Piłka",
-        questions: [],
-        active: false,
-        img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop"
-      },
-      {
-        id: 3,
-        title: "3. Liga Mistrzów",
-        questions: [],
-        active: false,
-        img: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop"
-      },
-      {
-        id: 4,
-        title: "4. World Cup",
-        questions: [],
-        active: false,
-        img: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop"
-      },
-      {
-        id: 5,
-        title: "5. Piłkarze",
-        questions: [],
-        active: false,
-        img: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop"
-      },
-      {
-        id: 6,
-        title: "6. Marki sportowe",
-        questions: [],
-        active: false,
-        img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop"
-      },
-      {
-        id: 7,
-        title: "7. Ligi",
-        questions: [],
-        active: false,
-        img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop"
-      },
-      {
-        id: 8,
-        title: "8. Kluby",
-        questions: [],
-        active: false,
-        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop"
-      }
-    ];
-
-    const savedNick = localStorage.getItem('rowneballer_nick');
-    if (savedNick) {
-      showApp(savedNick);
-    }
-
-    nickForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const username = document.getElementById('username').value.trim();
-      if (username) {
-        localStorage.setItem('rowneballer_nick', username);
-        showApp(username);
-      }
-    });
-
-    function showApp(nick) {
-      userDisplayName.textContent = nick;
-      authScreen.style.display = 'none';
-      appContent.style.display = 'flex';
-      renderQuizzes();
-    }
-
-    goToDashboardBtn.addEventListener('click', () => {
-      welcomeScreen.style.display = 'none';
-      dashboardScreen.style.display = 'flex';
-    });
-
-    backToHomeBtn.addEventListener('click', () => {
-      dashboardScreen.style.display = 'none';
-      welcomeScreen.style.display = 'flex';
-    });
-
-    openModalBtn.addEventListener('click', () => {
-      modalOverlay.style.display = 'flex';
-      initQuestionsForm();
-    });
-
-    closeModalBtn.addEventListener('click', () => {
-      modalOverlay.style.display = 'none';
-    });
-
-    modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) {
-        modalOverlay.style.display = 'none';
-      }
-    });
-
-    changeNickBtn.addEventListener('click', () => {
-      localStorage.removeItem('rowneballer_nick');
-      authScreen.style.display = 'flex';
-      appContent.style.display = 'none';
-      welcomeScreen.style.display = 'flex';
-      dashboardScreen.style.display = 'none';
-    });
-
-    function initQuestionsForm() {
-      questionsContainer.innerHTML = '';
-      for (let i = 1; i <= 5; i++) {
-        addQuestionBlock(i);
-      }
-    }
-
-    function addQuestionBlock(num) {
-      const div = document.createElement('div');
-      div.className = 'question-box';
-      div.innerHTML = `
-        <h4>Pytanie ${num}</h4>
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label>Treść pytania</label>
-          <input type="text" class="q-text" placeholder="Wpisz pytanie nr ${num}" required>
-        </div>
-        <div class="form-group" style="margin-bottom: 10px;">
-          <label>Adres URL grafiki (opcjonalnie)</label>
-          <input type="url" class="q-img" placeholder="https://example.com/zdjecie.jpg">
-        </div>
-        <label style="font-size: 13px; color: #94a3b8;">4 Opcje (zaznacz kropeczką prawidłową):</label>
-        <div class="options-grid">
-          <div class="option-input-group">
-            <input type="radio" name="correct-${num}" value="0" checked>
-            <input type="text" class="q-opt-0" placeholder="Opcja A" required>
-          </div>
-          <div class="option-input-group">
-            <input type="radio" name="correct-${num}" value="1">
-            <input type="text" class="q-opt-1" placeholder="Opcja B" required>
-          </div>
-          <div class="option-input-group">
-            <input type="radio" name="correct-${num}" value="2">
-            <input type="text" class="q-opt-2" placeholder="Opcja C" required>
-          </div>
-          <div class="option-input-group">
-            <input type="radio" name="correct-${num}" value="3">
-            <input type="text" class="q-opt-3" placeholder="Opcja D" required>
-          </div>
-        </div>
-      `;
-      questionsContainer.appendChild(div);
-    }
-
-    addQuestionBtn.addEventListener('click', () => {
-      const currentCount = questionsContainer.querySelectorAll('.question-box').length + 1;
-      addQuestionBlock(currentCount);
-    });
-
-    function renderQuizzes() {
-      quizContainer.innerHTML = '';
-      quizy.forEach(q => {
-        const card = document.createElement('div');
-        card.className = 'quiz-card';
-        
-        if (q.active) {
-          card.innerHTML = `
-            <img src="${q.img}" alt="Quiz Image">
-            <div class="quiz-card-content">
-              <div class="quiz-card-title">${q.title}</div>
-              <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">Liczba pytań: ${q.questions.length}</p>
-              <button class="btn-play" onclick="alert('Startujemy quiz: ${q.title}!')">Zagraj</button>
-            </div>
-          `;
-        } else {
-          card.innerHTML = `
-            <img src="${q.img}" alt="Wolne miejsce" style="opacity: 0.3;">
-            <div class="quiz-card-content" style="align-items: center; justify-content: center; text-align: center;">
-              <div class="quiz-card-title" style="color: #64748b;">${q.title}</div>
-              <p style="font-size: 12px; color: #475569;">Wolne miejsce</p>
-            </div>
-          `;
-        }
-        quizContainer.appendChild(card);
-      });
-    }
-
-    createQuizForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const titleInput = document.getElementById('quiz-title').value.trim();
-      const questionBoxes = questionsContainer.querySelectorAll('.question-box');
-      
-      if (questionBoxes.length < 5) {
-        alert('Quiz musi zawierać minimum 5 pytań!');
-        return;
-      }
-
-      let questionsList = [];
-      questionBoxes.forEach((box, index) => {
-        const qText = box.querySelector('.q-text').value;
-        const qImg = box.querySelector('.q-img').value || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop';
-        const opt0 = box.querySelector('.q-opt-0').value;
-        const opt1 = box.querySelector('.q-opt-1').value;
-        const opt2 = box.querySelector('.q-opt-2').value;
-        const opt3 = box.querySelector('.q-opt-3').value;
-        const correctVal = box.querySelector(`input[name="correct-${index + 1}"]:checked`).value;
-
-        questionsList.push({
-          question: qText,
-          img: qImg,
-          options: [opt0, opt1, opt2, opt3],
-          correct: parseInt(correctVal)
-        });
-      });
-
-      // Sprawdzamy czy użytkownik wpisał nazwę pasującą do któregoś wolnego slotu (np. "Złota Piłka")
-      const targetSlot = quizy.find(q => !q.active && q.title.toLowerCase().includes(titleInput.toLowerCase()));
-      
-      if (targetSlot) {
-        targetSlot.questions = questionsList;
-        targetSlot.active = true;
-        targetSlot.img = questionsList[0].img;
-      } else {
-        // Albo wypełniamy pierwsze wolne miejsce
-        const firstFree = quizy.find(q => !q.active);
-        if (firstFree) {
-          firstFree.title = `${firstFree.id}. ${titleInput}`;
-          firstFree.questions = questionsList;
-          firstFree.active = true;
-          firstFree.img = questionsList[0].img;
-        } else {
-          quizy.push({
-            id: quizy.length + 1,
-            title: `${quizy.length + 1}. ${titleInput}`,
-            questions: questionsList,
-            active: true,
-            img: questionsList[0].img
-          });
-        }
-      }
-
-      renderQuizzes();
-      createQuizForm.reset();
-      modalOverlay.style.display = 'none';
-      alert('Twój quiz został pomyślnie dodany do wybranego slotu!');
-    });
-  </script>
-</body>
-</html>
+      { id: 1, title: "1. Historia RówneBaller", questions: [], active: false, img: "
