@@ -383,7 +383,7 @@
       <button class="btn-next" id="go-to-dashboard-btn">Przejdź dalej ➔</button>
     </div>
 
-    <!-- 2. GŁÓWNE GUI QUIZÓW (8 SLOTÓW) -->
+    <!-- 2. GŁÓWNE GUI QUIZÓW (8 KAFELKÓW) -->
     <div id="dashboard-screen">
       <div class="section-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -443,28 +443,66 @@
     const addQuestionBtn = document.getElementById('add-question-btn');
     const quizContainer = document.getElementById('quiz-container');
 
-    // 8 domyślnych quizów (1 aktywny, 7 wolnych)
+    // 8 docelowych quizów piłkarskich
     let quizy = [
       {
         id: 1,
         title: "1. Historia RówneBaller",
         questions: [
-          {
-            question: "W którym roku powstał kanał TikTok RówneBaller?",
-            img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop",
-            options: ["2021", "2022", "2023", "2024"],
-            correct: 2
-          }
+          { question: "W którym roku powstał kanał TikTok RówneBaller?", img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", options: ["2021", "2022", "2023", "2024"], correct: 2 }
         ],
-        active: true
+        active: true,
+        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop"
       },
-      { id: 2, title: "2. Wolne", active: false },
-      { id: 3, title: "3. Wolne", active: false },
-      { id: 4, title: "4. Wolne", active: false },
-      { id: 5, title: "5. Wolne", active: false },
-      { id: 6, title: "6. Wolne", active: false },
-      { id: 7, title: "7. Wolne", active: false },
-      { id: 8, title: "8. Wolne", active: false }
+      {
+        id: 2,
+        title: "2. Złota Piłka",
+        questions: [],
+        active: false,
+        img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop"
+      },
+      {
+        id: 3,
+        title: "3. Liga Mistrzów",
+        questions: [],
+        active: false,
+        img: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop"
+      },
+      {
+        id: 4,
+        title: "4. World Cup",
+        questions: [],
+        active: false,
+        img: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop"
+      },
+      {
+        id: 5,
+        title: "5. Piłkarze",
+        questions: [],
+        active: false,
+        img: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop"
+      },
+      {
+        id: 6,
+        title: "6. Marki sportowe",
+        questions: [],
+        active: false,
+        img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop"
+      },
+      {
+        id: 7,
+        title: "7. Ligi",
+        questions: [],
+        active: false,
+        img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop"
+      },
+      {
+        id: 8,
+        title: "8. Kluby",
+        questions: [],
+        active: false,
+        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop"
+      }
     ];
 
     const savedNick = localStorage.getItem('rowneballer_nick');
@@ -498,10 +536,9 @@
       welcomeScreen.style.display = 'flex';
     });
 
-    // Obsługa okienka (modala) tworzenia quizu
     openModalBtn.addEventListener('click', () => {
       modalOverlay.style.display = 'flex';
-      initQuestionsForm(); // Generuje startowe 5 pytań
+      initQuestionsForm();
     });
 
     closeModalBtn.addEventListener('click', () => {
@@ -522,7 +559,6 @@
       dashboardScreen.style.display = 'none';
     });
 
-    // Inicjalizacja formularza z 5 pytaniami
     function initQuestionsForm() {
       questionsContainer.innerHTML = '';
       for (let i = 1; i <= 5; i++) {
@@ -578,9 +614,8 @@
         card.className = 'quiz-card';
         
         if (q.active) {
-          const firstImg = q.questions && q.questions[0] && q.questions[0].img ? q.questions[0].img : 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop';
           card.innerHTML = `
-            <img src="${firstImg}" alt="Quiz Image">
+            <img src="${q.img}" alt="Quiz Image">
             <div class="quiz-card-content">
               <div class="quiz-card-title">${q.title}</div>
               <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">Liczba pytań: ${q.questions.length}</p>
@@ -589,7 +624,7 @@
           `;
         } else {
           card.innerHTML = `
-            <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop" alt="Wolne miejsce" style="opacity: 0.3;">
+            <img src="${q.img}" alt="Wolne miejsce" style="opacity: 0.3;">
             <div class="quiz-card-content" style="align-items: center; justify-content: center; text-align: center;">
               <div class="quiz-card-title" style="color: #64748b;">${q.title}</div>
               <p style="font-size: 12px; color: #475569;">Wolne miejsce</p>
@@ -603,7 +638,7 @@
     createQuizForm.addEventListener('submit', (e) => {
       e.preventDefault();
       
-      const title = document.getElementById('quiz-title').value;
+      const titleInput = document.getElementById('quiz-title').value.trim();
       const questionBoxes = questionsContainer.querySelectorAll('.question-box');
       
       if (questionBoxes.length < 5) {
@@ -629,28 +664,36 @@
         });
       });
 
-      const firstFreeIndex = quizy.findIndex(q => !q.active);
+      // Sprawdzamy czy użytkownik wpisał nazwę pasującą do któregoś wolnego slotu (np. "Złota Piłka")
+      const targetSlot = quizy.find(q => !q.active && q.title.toLowerCase().includes(titleInput.toLowerCase()));
       
-      if (firstFreeIndex !== -1) {
-        quizy[firstFreeIndex] = {
-          id: firstFreeIndex + 1,
-          title: `${firstFreeIndex + 1}. ${title}`,
-          questions: questionsList,
-          active: true
-        };
+      if (targetSlot) {
+        targetSlot.questions = questionsList;
+        targetSlot.active = true;
+        targetSlot.img = questionsList[0].img;
       } else {
-        quizy.push({
-          id: quizy.length + 1,
-          title: `${quizy.length + 1}. ${title}`,
-          questions: questionsList,
-          active: true
-        });
+        // Albo wypełniamy pierwsze wolne miejsce
+        const firstFree = quizy.find(q => !q.active);
+        if (firstFree) {
+          firstFree.title = `${firstFree.id}. ${titleInput}`;
+          firstFree.questions = questionsList;
+          firstFree.active = true;
+          firstFree.img = questionsList[0].img;
+        } else {
+          quizy.push({
+            id: quizy.length + 1,
+            title: `${quizy.length + 1}. ${titleInput}`,
+            questions: questionsList,
+            active: true,
+            img: questionsList[0].img
+          });
+        }
       }
 
       renderQuizzes();
       createQuizForm.reset();
       modalOverlay.style.display = 'none';
-      alert('Twój quiz z 5+ pytaniami został pomyślnie dodany!');
+      alert('Twój quiz został pomyślnie dodany do wybranego slotu!');
     });
   </script>
 </body>
