@@ -111,22 +111,6 @@
       color: #38bdf8;
     }
 
-    .btn-create-nav {
-      background: #0284c7;
-      color: white;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.2s;
-    }
-
-    .btn-create-nav:hover {
-      background: #0369a1;
-    }
-
     .btn-change-nick {
       background: #475569;
       padding: 6px 12px;
@@ -271,7 +255,7 @@
     /* LISTA QUIZÓW */
     .quiz-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       gap: 20px;
     }
 
@@ -286,7 +270,7 @@
 
     .quiz-card img {
       width: 100%;
-      height: 160px;
+      height: 130px;
       object-fit: cover;
     }
 
@@ -299,22 +283,23 @@
     }
 
     .quiz-card-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: bold;
       color: #f8fafc;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
 
     .btn-play {
       background: #10b981;
       color: white;
       border: none;
-      padding: 10px;
+      padding: 8px;
       border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
-      margin-top: 15px;
+      margin-top: 10px;
       transition: background 0.2s;
+      font-size: 14px;
     }
 
     .btn-play:hover {
@@ -345,8 +330,6 @@
     <nav>
       <div class="logo">RówneBaller</div>
       <div class="nav-right">
-        <!-- Przycisk Stwórz Quiz w menu na górze -->
-        <button class="btn-create-nav" id="nav-create-btn">Stwórz Quiz</button>
         <span class="user-info">Cześć, <strong id="user-display-name">Gracz</strong>!</span>
         <button class="btn-change-nick" id="change-nick-btn">Zmień nick</button>
       </div>
@@ -363,17 +346,17 @@
     <!-- 2. GŁÓWNE GUI QUIZÓW (PO KLIKNIĘCIU) -->
     <div id="dashboard-screen">
       
-      <!-- TWÓRZ QUIZ -->
+      <!-- TWÓRZ QUIZ (NA SAMEJ GÓRZE) -->
       <div class="section-card">
         <h2 class="section-title">
-          <span>Stwórz Quiz</span>
+          <span>Stwórz quiz tutaj</span>
           <button class="btn-back-home" id="back-to-home-btn">← Powrót</button>
         </h2>
         <form id="create-quiz-form" class="create-grid">
           
           <div class="form-group full-width">
             <label>Nazwa Quizu</label>
-            <input type="text" id="quiz-title" placeholder="np. Historia RówneBaller" required>
+            <input type="text" id="quiz-title" placeholder="np. Mój własny quiz piłkarski" required>
           </div>
 
           <div class="form-group full-width">
@@ -409,12 +392,12 @@
           </div>
 
           <div class="full-width">
-            <button type="submit" class="btn" style="background: #10b981;">Dodaj Quiz</button>
+            <button type="submit" class="btn" style="background: #10b981;">Dodaj Quiz do listy</button>
           </div>
         </form>
       </div>
 
-      <!-- NASZE QUIZY -->
+      <!-- NASZE QUIZY (8 SLOTÓW) -->
       <div class="section-card">
         <h2 class="section-title">Nasze Quizy</h2>
         <div class="quiz-list" id="quiz-container">
@@ -436,25 +419,31 @@
     const changeNickBtn = document.getElementById('change-nick-btn');
     
     const goToDashboardBtn = document.getElementById('go-to-dashboard-btn');
-    const navCreateBtn = document.getElementById('nav-create-btn');
     const backToHomeBtn = document.getElementById('back-to-home-btn');
     
     const createQuizForm = document.getElementById('create-quiz-form');
     const quizContainer = document.getElementById('quiz-container');
 
-    // Domyślne quizy (w tym Quiz Historia RówneBaller)
+    // 8 domyślnych quizów (1 aktywny, 7 wolnych)
     let quizy = [
       {
         id: 1,
-        title: "Historia RówneBaller",
+        title: "1. Historia RówneBaller",
         question: "W którym roku powstał kanał TikTok RówneBaller?",
         img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop",
         options: ["2021", "2022", "2023", "2024"],
-        correct: 2
-      }
+        correct: 2,
+        active: true
+      },
+      { id: 2, title: "2. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
+      { id: 3, title: "3. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
+      { id: 4, title: "4. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
+      { id: 5, title: "5. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
+      { id: 6, title: "6. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
+      { id: 7, title: "7. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
+      { id: 8, title: "8. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false }
     ];
 
-    // Sprawdzanie zapamiętanego nicku
     const savedNick = localStorage.getItem('rowneballer_nick');
     if (savedNick) {
       showApp(savedNick);
@@ -476,14 +465,10 @@
       renderQuizzes();
     }
 
-    // Przechodzenie między ekranami
-    function openDashboard() {
+    goToDashboardBtn.addEventListener('click', () => {
       welcomeScreen.style.display = 'none';
       dashboardScreen.style.display = 'flex';
-    }
-
-    goToDashboardBtn.addEventListener('click', openDashboard);
-    navCreateBtn.addEventListener('click', openDashboard);
+    });
 
     backToHomeBtn.addEventListener('click', () => {
       dashboardScreen.style.display = 'none';
@@ -498,50 +483,74 @@
       dashboardScreen.style.display = 'none';
     });
 
-    // Renderowanie Listy Quizów
     function renderQuizzes() {
       quizContainer.innerHTML = '';
       quizy.forEach(q => {
         const card = document.createElement('div');
         card.className = 'quiz-card';
-        card.innerHTML = `
-          <img src="${q.img || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop'}" alt="Quiz Image">
-          <div class="quiz-card-content">
-            <div class="quiz-card-title">${q.title}</div>
-            <p style="font-size: 13px; color: #94a3b8;">Pytanie: ${q.question}</p>
-            <button class="btn-play" onclick="alert('Zaczynamy quiz: ${q.title}!')">Zagraj w Quiz</button>
-          </div>
-        `;
+        
+        if (q.active) {
+          card.innerHTML = `
+            <img src="${q.img}" alt="Quiz Image">
+            <div class="quiz-card-content">
+              <div class="quiz-card-title">${q.title}</div>
+              <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">${q.question}</p>
+              <button class="btn-play" onclick="alert('Startujemy quiz: ${q.title}!')">Zagraj</button>
+            </div>
+          `;
+        } else {
+          card.innerHTML = `
+            <img src="${q.img}" alt="Wolne miejsce" style="opacity: 0.3;">
+            <div class="quiz-card-content" style="align-items: center; justify-content: center; text-align: center;">
+              <div class="quiz-card-title" style="color: #64748b;">${q.title}</div>
+              <p style="font-size: 12px; color: #475569;">Miejsce na kolejny quiz</p>
+            </div>
+          `;
+        }
         quizContainer.appendChild(card);
       });
     }
 
-    // Dodawanie Nowego Quizu
     createQuizForm.addEventListener('submit', (e) => {
       e.preventDefault();
       
       const title = document.getElementById('quiz-title').value;
       const question = document.getElementById('quiz-question').value;
-      const img = document.getElementById('quiz-image').value;
+      const img = document.getElementById('quiz-image').value || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop';
       
       const optionInputs = document.querySelectorAll('.opt-text');
       const options = Array.from(optionInputs).map(i => i.value);
-      
       const correctRadio = document.querySelector('input[name="correct-opt"]:checked').value;
 
-      const newQuiz = {
-        id: Date.now(),
-        title: title,
-        question: question,
-        img: img,
-        options: options,
-        correct: parseInt(correctRadio)
-      };
+      // Znajdujemy pierwsze wolne miejsce i je wypełniamy
+      const firstFreeIndex = quizy.findIndex(q => !q.active);
+      
+      if (firstFreeIndex !== -1) {
+        quizy[firstFreeIndex] = {
+          id: firstFreeIndex + 1,
+          title: `${firstFreeIndex + 1}. ${title}`,
+          question: question,
+          img: img,
+          options: options,
+          correct: parseInt(correctRadio),
+          active: true
+        };
+      } else {
+        // Jeśli wszystkie 8 są zajęte, dodajemy kolejny
+        quizy.push({
+          id: quizy.length + 1,
+          title: `${quizy.length + 1}. ${title}`,
+          question: question,
+          img: img,
+          options: options,
+          correct: parseInt(correctRadio),
+          active: true
+        });
+      }
 
-      quizy.push(newQuiz);
       renderQuizzes();
       createQuizForm.reset();
-      alert('Quiz został pomyślnie dodany!');
+      alert('Twój quiz został dodany do listy!');
     });
   </script>
 </body>
