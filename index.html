@@ -111,6 +111,22 @@
       color: #38bdf8;
     }
 
+    .btn-create-modal {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .btn-create-modal:hover {
+      background: #059669;
+    }
+
     .btn-change-nick {
       background: #475569;
       padding: 6px 12px;
@@ -173,7 +189,7 @@
       box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
     }
 
-    /* GŁÓWNE GUI QUIZÓW (UKRYTE DOMYŚLNIE) */
+    /* GŁÓWNE GUI QUIZÓW */
     #dashboard-screen {
       display: none;
       padding: 30px;
@@ -197,23 +213,47 @@
       margin-bottom: 20px;
       border-bottom: 2px solid #334155;
       padding-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
-    .btn-back-home {
-      background: #475569;
-      color: white;
+    /* MODAL / OKIENKO TWORZENIA QUIZU */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 30px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+      position: relative;
+    }
+
+    .btn-close-modal {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      background: transparent;
       border: none;
-      padding: 5px 12px;
-      border-radius: 4px;
-      font-size: 13px;
+      color: #94a3b8;
+      font-size: 20px;
       cursor: pointer;
     }
 
-    .btn-back-home:hover {
-      background: #64748b;
+    .btn-close-modal:hover {
+      color: #fff;
     }
 
     /* FORMULARZ TWORZENIA QUIZU */
@@ -330,6 +370,7 @@
     <nav>
       <div class="logo">RówneBaller</div>
       <div class="nav-right">
+        <button class="btn-create-modal" id="open-modal-btn">+ Stwórz quiz</button>
         <span class="user-info">Cześć, <strong id="user-display-name">Gracz</strong>!</span>
         <button class="btn-change-nick" id="change-nick-btn">Zmień nick</button>
       </div>
@@ -343,68 +384,68 @@
       <button class="btn-next" id="go-to-dashboard-btn">Przejdź dalej ➔</button>
     </div>
 
-    <!-- 2. GŁÓWNE GUI QUIZÓW (PO KLIKNIĘCIU) -->
+    <!-- 2. GŁÓWNE GUI QUIZÓW (8 SLOTÓW) -->
     <div id="dashboard-screen">
-      
-      <!-- TWÓRZ QUIZ (NA SAMEJ GÓRZE) -->
       <div class="section-card">
-        <h2 class="section-title">
-          <span>Stwórz quiz tutaj</span>
-          <button class="btn-back-home" id="back-to-home-btn">← Powrót</button>
-        </h2>
-        <form id="create-quiz-form" class="create-grid">
-          
-          <div class="form-group full-width">
-            <label>Nazwa Quizu</label>
-            <input type="text" id="quiz-title" placeholder="np. Mój własny quiz piłkarski" required>
-          </div>
-
-          <div class="form-group full-width">
-            <label>Pytanie</label>
-            <input type="text" id="quiz-question" placeholder="Wpisz treść pytania" required>
-          </div>
-
-          <div class="form-group full-width">
-            <label>Adres URL Grafiki (opcjonalnie)</label>
-            <input type="url" id="quiz-image" placeholder="https://example.com/zdjecie.jpg">
-          </div>
-
-          <div class="form-group full-width">
-            <label>4 Opcje odpowiedzi (zaznacz kropeczką prawidłową):</label>
-            <div class="options-grid">
-              <div class="option-input-group">
-                <input type="radio" name="correct-opt" value="0" checked>
-                <input type="text" class="opt-text" placeholder="Opcja A" required>
-              </div>
-              <div class="option-input-group">
-                <input type="radio" name="correct-opt" value="1">
-                <input type="text" class="opt-text" placeholder="Opcja B" required>
-              </div>
-              <div class="option-input-group">
-                <input type="radio" name="correct-opt" value="2">
-                <input type="text" class="opt-text" placeholder="Opcja C" required>
-              </div>
-              <div class="option-input-group">
-                <input type="radio" name="correct-opt" value="3">
-                <input type="text" class="opt-text" placeholder="Opcja D" required>
-              </div>
-            </div>
-          </div>
-
-          <div class="full-width">
-            <button type="submit" class="btn" style="background: #10b981;">Dodaj Quiz do listy</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- NASZE QUIZY (8 SLOTÓW) -->
-      <div class="section-card">
-        <h2 class="section-title">Nasze Quizy</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 class="section-title" style="margin-bottom: 0; border: none;">Nasze Quizy</h2>
+          <button class="btn" style="width: auto; padding: 8px 16px; background: #475569;" id="back-to-home-btn">← Powrót</button>
+        </div>
         <div class="quiz-list" id="quiz-container">
           <!-- Quizy generują się automatycznie -->
         </div>
       </div>
+    </div>
+  </div>
 
+  <!-- MODAL / ODDZIELNE OKIENKO DO TWORZENIA QUIZU -->
+  <div id="modal-overlay">
+    <div class="modal-content">
+      <button class="btn-close-modal" id="close-modal-btn">&times;</button>
+      <h2 style="color: #38bdf8; margin-bottom: 20px;">Stwórz Quiz tutaj</h2>
+      
+      <form id="create-quiz-form" class="create-grid">
+        <div class="form-group full-width">
+          <label>Nazwa Quizu</label>
+          <input type="text" id="quiz-title" placeholder="np. Mój quiz piłkarski" required>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Pytanie</label>
+          <input type="text" id="quiz-question" placeholder="Wpisz treść pytania" required>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Adres URL Grafiki (opcjonalnie)</label>
+          <input type="url" id="quiz-image" placeholder="https://example.com/zdjecie.jpg">
+        </div>
+
+        <div class="form-group full-width">
+          <label>4 Opcje odpowiedzi (zaznacz kropeczką prawidłową):</label>
+          <div class="options-grid">
+            <div class="option-input-group">
+              <input type="radio" name="correct-opt" value="0" checked>
+              <input type="text" class="opt-text" placeholder="Opcja A" required>
+            </div>
+            <div class="option-input-group">
+              <input type="radio" name="correct-opt" value="1">
+              <input type="text" class="opt-text" placeholder="Opcja B" required>
+            </div>
+            <div class="option-input-group">
+              <input type="radio" name="correct-opt" value="2">
+              <input type="text" class="opt-text" placeholder="Opcja C" required>
+            </div>
+            <div class="option-input-group">
+              <input type="radio" name="correct-opt" value="3">
+              <input type="text" class="opt-text" placeholder="Opcja D" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="full-width" style="margin-top: 10px;">
+          <button type="submit" class="btn" style="background: #10b981;">Dodaj Quiz do listy</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -420,6 +461,10 @@
     
     const goToDashboardBtn = document.getElementById('go-to-dashboard-btn');
     const backToHomeBtn = document.getElementById('back-to-home-btn');
+    
+    const openModalBtn = document.getElementById('open-modal-btn');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const modalOverlay = document.getElementById('modal-overlay');
     
     const createQuizForm = document.getElementById('create-quiz-form');
     const quizContainer = document.getElementById('quiz-container');
@@ -475,6 +520,21 @@
       welcomeScreen.style.display = 'flex';
     });
 
+    // Obsługa okienka (modala) tworzenia quizu
+    openModalBtn.addEventListener('click', () => {
+      modalOverlay.style.display = 'flex';
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      modalOverlay.style.display = 'none';
+    });
+
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        modalOverlay.style.display = 'none';
+      }
+    });
+
     changeNickBtn.addEventListener('click', () => {
       localStorage.removeItem('rowneballer_nick');
       authScreen.style.display = 'flex';
@@ -503,7 +563,7 @@
             <img src="${q.img}" alt="Wolne miejsce" style="opacity: 0.3;">
             <div class="quiz-card-content" style="align-items: center; justify-content: center; text-align: center;">
               <div class="quiz-card-title" style="color: #64748b;">${q.title}</div>
-              <p style="font-size: 12px; color: #475569;">Miejsce na kolejny quiz</p>
+              <p style="font-size: 12px; color: #475569;">Wolne miejsce</p>
             </div>
           `;
         }
@@ -522,7 +582,6 @@
       const options = Array.from(optionInputs).map(i => i.value);
       const correctRadio = document.querySelector('input[name="correct-opt"]:checked').value;
 
-      // Znajdujemy pierwsze wolne miejsce i je wypełniamy
       const firstFreeIndex = quizy.findIndex(q => !q.active);
       
       if (firstFreeIndex !== -1) {
@@ -536,7 +595,6 @@
           active: true
         };
       } else {
-        // Jeśli wszystkie 8 są zajęte, dodajemy kolejny
         quizy.push({
           id: quizy.length + 1,
           title: `${quizy.length + 1}. ${title}`,
@@ -550,6 +608,7 @@
 
       renderQuizzes();
       createQuizForm.reset();
+      modalOverlay.style.display = 'none';
       alert('Twój quiz został dodany do listy!');
     });
   </script>
