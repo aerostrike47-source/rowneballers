@@ -48,9 +48,15 @@
       color: #94a3b8;
     }
 
-    .form-group input {
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper input {
       width: 100%;
-      padding: 10px;
+      padding: 10px 40px 10px 10px;
       border-radius: 6px;
       border: 1px solid #334155;
       background: #0f172a;
@@ -58,9 +64,22 @@
       font-size: 14px;
     }
 
-    .form-group input:focus {
+    .input-wrapper input:focus {
       outline: none;
       border-color: #38bdf8;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 16px;
+      opacity: 0.7;
+    }
+
+    .toggle-password:hover {
+      opacity: 1;
     }
 
     .btn {
@@ -99,7 +118,7 @@
       text-align: center;
     }
 
-    /* GLOWNA ZAWARTOSC PO ZALOGOWANIU */
+    /* GŁÓWNA ZAWARTOŚĆ PO ZALOGOWANIU */
     #app-content {
       display: none;
       flex-direction: column;
@@ -118,6 +137,15 @@
     .logo {
       font-size: 20px;
       font-weight: bold;
+      color: #38bdf8;
+    }
+
+    .user-info {
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .user-info strong {
       color: #38bdf8;
     }
 
@@ -152,7 +180,6 @@
       padding: 20px;
     }
 
-    /* ANIMACJA TEKSTU POWITALNEGO */
     .welcome-text {
       font-size: 28px;
       font-weight: 700;
@@ -183,22 +210,32 @@
       <form id="auth-form">
         <div class="form-group" id="name-group" style="display: none;">
           <label for="username">Nazwa użytkownika</label>
-          <input type="text" id="username" placeholder="Twój nick">
+          <div class="input-wrapper">
+            <input type="text" id="username" placeholder="Twój unikalny nick">
+          </div>
         </div>
 
         <div class="form-group">
           <label for="email">E-mail</label>
-          <input type="email" id="email" required placeholder="twoj@email.com">
+          <div class="input-wrapper">
+            <input type="email" id="email" required placeholder="twoj@email.com">
+          </div>
         </div>
 
         <div class="form-group">
           <label for="password">Hasło</label>
-          <input type="password" id="password" required placeholder="••••••••">
+          <div class="input-wrapper">
+            <input type="password" id="password" required placeholder="••••••••">
+            <span class="toggle-password" id="toggle-pass1">👁️</span>
+          </div>
         </div>
 
         <div class="form-group" id="confirm-password-group" style="display: none;">
           <label for="confirm-password">Potwierdź hasło</label>
-          <input type="password" id="confirm-password" placeholder="••••••••">
+          <div class="input-wrapper">
+            <input type="password" id="confirm-password" placeholder="••••••••">
+            <span class="toggle-password" id="toggle-pass2">👁️</span>
+          </div>
         </div>
 
         <button type="submit" class="btn" id="submit-btn">Zaloguj się</button>
@@ -210,14 +247,12 @@
     </div>
   </div>
 
-  <!-- STRONA GLÓWNA (WIDOCZNA PO ZALOGOWANIU) -->
+  <!-- STRONA GŁÓWNA -->
   <div id="app-content">
     <nav>
       <div class="logo">RówneBaller</div>
-      <div class="nav-links">
-        <a href="#">Strona Główna</a>
-        <a href="#">Quizy</a>
-        <a href="#">Info-Konkurs</a>
+      <div class="nav-right">
+        <span class="user-info">Cześć, <strong id="user-display-name">Gracz</strong>!</span>
         <button class="btn-logout" id="logout-btn">Wyloguj</button>
       </div>
     </nav>
@@ -240,6 +275,12 @@
       signOut,
       updateProfile
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      setDoc 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     // KROK DLA CIEBIE: Podmień ponizsze dane danymi ze swojego projektu Firebase!
     const firebaseConfig = {
@@ -253,9 +294,11 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
     let isSignUp = false;
 
+    // Elementy HTML
     const authScreen = document.getElementById('auth-screen');
     const appContent = document.getElementById('app-content');
     const authForm = document.getElementById('auth-form');
@@ -266,11 +309,29 @@
     const confirmPasswordGroup = document.getElementById('confirm-password-group');
     const errorMsg = document.getElementById('error-message');
     const logoutBtn = document.getElementById('logout-btn');
+    const userDisplayName = document.getElementById('user-display-name');
 
-    // Przełączanie między Logowaniem a Rejestracją
+    const passInput = document.getElementById('password');
+    const confirmPassInput = document.getElementById('confirm-password');
+    const togglePass1 = document.getElementById('toggle-pass1');
+    const togglePass2 = document.getElementById('toggle-pass2');
+
+    // Pokazywanie / Ukrywanie haseł
+    togglePass1.addEventListener('click', () => {
+      const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passInput.setAttribute('type', type);
+    });
+
+    togglePass2.addEventListener('click', () => {
+      const type = confirmPassInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      confirmPassInput.setAttribute('type', type);
+    });
+
+    // Przełączanie Trybu (Logowanie <-> Rejestracja)
     toggleLink.addEventListener('click', () => {
       isSignUp = !isSignUp;
       errorMsg.textContent = '';
+      authForm.reset();
       if (isSignUp) {
         formTitle.textContent = 'Zarejestruj się';
         submitBtn.textContent = 'Stwórz konto';
@@ -286,17 +347,17 @@
       }
     });
 
-    // Obsługa Formularza
+    // Obsługa Wysyłania Formularza
     authForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorMsg.textContent = '';
 
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const email = document.getElementById('email').value.trim();
+      const password = passInput.value;
 
       if (isSignUp) {
-        const username = document.getElementById('username').value;
-        const confirmPassword = document.getElementById('confirm-password').value;
+        const username = document.getElementById('username').value.trim();
+        const confirmPassword = confirmPassInput.value;
 
         if (!username) {
           errorMsg.textContent = 'Wpisz nazwę użytkownika!';
@@ -309,25 +370,47 @@
         }
 
         try {
+          // 1. Sprawdzenie czy nick jest zajęty w Firestore
+          const usernameClean = username.toLowerCase();
+          const userDocRef = doc(db, "usernames", usernameClean);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            errorMsg.textContent = 'Ta nazwa użytkownika jest już zajęta. Wybierz inną!';
+            return;
+          }
+
+          // 2. Rejestracja konta w Firebase Auth
           const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          
+          // 3. Zapisanie nicku w profilu i bazie Firestore
           await updateProfile(userCredential.user, { displayName: username });
+          await setDoc(userDocRef, { uid: userCredential.user.uid });
+
         } catch (error) {
-          errorMsg.textContent = 'Błąd rejestracji: ' + error.message;
+          if (error.code === 'auth/email-already-in-use') {
+            errorMsg.textContent = 'Ten e-mail jest już zarejestrowany.';
+          } else if (error.code === 'auth/weak-password') {
+            errorMsg.textContent = 'Hasło musi mieć co najmniej 6 znaków.';
+          } else {
+            errorMsg.textContent = 'Błąd rejestracji: ' + error.message;
+          }
         }
       } else {
         try {
           await signInWithEmailAndPassword(auth, email, password);
         } catch (error) {
-          errorMsg.textContent = 'Błąd logowania: Sprawdź e-mail i hasło.';
+          errorMsg.textContent = 'Błąd logowania: Nieprawidłowy e-mail lub hasło.';
         }
       }
     });
 
-    // Obsługa stanu zalogowania
+    // Stan zalogowania
     onAuthStateChanged(auth, (user) => {
       if (user) {
         authScreen.style.display = 'none';
         appContent.style.display = 'flex';
+        userDisplayName.textContent = user.displayName || 'Gracz';
       } else {
         authScreen.style.display = 'flex';
         appContent.style.display = 'none';
