@@ -20,7 +20,7 @@
       flex-direction: column;
     }
 
-    /* KONTENER LOGOWANIA / REJESTRACJI */
+    /* WEJŚCIE / NICK */
     .auth-container {
       max-width: 400px;
       margin: auto;
@@ -43,43 +43,24 @@
 
     .form-group label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       font-size: 14px;
       color: #94a3b8;
     }
 
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-wrapper input {
+    .form-group input {
       width: 100%;
-      padding: 10px 40px 10px 10px;
+      padding: 12px;
       border-radius: 6px;
       border: 1px solid #334155;
       background: #0f172a;
       color: #fff;
-      font-size: 14px;
+      font-size: 15px;
     }
 
-    .input-wrapper input:focus {
+    .form-group input:focus {
       outline: none;
       border-color: #38bdf8;
-    }
-
-    .toggle-password {
-      position: absolute;
-      right: 10px;
-      cursor: pointer;
-      user-select: none;
-      font-size: 16px;
-      opacity: 0.7;
-    }
-
-    .toggle-password:hover {
-      opacity: 1;
     }
 
     .btn {
@@ -91,6 +72,7 @@
       border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
+      font-size: 15px;
       transition: background 0.2s;
     }
 
@@ -98,27 +80,14 @@
       background: #0369a1;
     }
 
-    .toggle-auth {
-      margin-top: 15px;
-      text-align: center;
-      font-size: 14px;
-      color: #94a3b8;
-    }
-
-    .toggle-auth span {
-      color: #38bdf8;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-
     .error-msg {
       color: #ef4444;
       font-size: 13px;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
       text-align: center;
     }
 
-    /* GŁÓWNA ZAWARTOŚĆ PO ZALOGOWANIU */
+    /* STRONA GŁÓWNA */
     #app-content {
       display: none;
       flex-direction: column;
@@ -141,7 +110,7 @@
     }
 
     .user-info {
-      font-size: 14px;
+      font-size: 15px;
       color: #94a3b8;
     }
 
@@ -149,26 +118,19 @@
       color: #38bdf8;
     }
 
-    .nav-links a {
-      color: #cbd5e1;
-      text-decoration: none;
-      margin-left: 20px;
-      font-weight: 500;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover {
-      color: #38bdf8;
-    }
-
-    .btn-logout {
-      background: #dc2626;
+    .btn-change-nick {
+      background: #475569;
       padding: 6px 12px;
       border-radius: 4px;
       color: white;
       border: none;
       cursor: pointer;
-      margin-left: 20px;
+      margin-left: 15px;
+      font-size: 13px;
+    }
+
+    .btn-change-nick:hover {
+      background: #64748b;
     }
 
     main {
@@ -201,49 +163,20 @@
 </head>
 <body>
 
-  <!-- EKRAN AUTORYZACJI -->
+  <!-- EKRAN PODAWANIA NICKU -->
   <div id="auth-screen" style="display: flex; min-height: 100vh; width: 100%;">
     <div class="auth-container">
-      <h2 id="form-title">Zaloguj się</h2>
+      <h2>Wpisz swój Nick</h2>
       <div id="error-message" class="error-msg"></div>
       
-      <form id="auth-form">
-        <div class="form-group" id="name-group" style="display: none;">
-          <label for="username">Nazwa użytkownika</label>
-          <div class="input-wrapper">
-            <input type="text" id="username" placeholder="Twój unikalny nick">
-          </div>
-        </div>
-
+      <form id="nick-form">
         <div class="form-group">
-          <label for="email">E-mail</label>
-          <div class="input-wrapper">
-            <input type="email" id="email" required placeholder="twoj@email.com">
-          </div>
+          <label for="username">Twój unikalny nick do quizów:</label>
+          <input type="text" id="username" placeholder="np. Baller10" required>
         </div>
 
-        <div class="form-group">
-          <label for="password">Hasło</label>
-          <div class="input-wrapper">
-            <input type="password" id="password" required placeholder="••••••••">
-            <span class="toggle-password" id="toggle-pass1">👁️</span>
-          </div>
-        </div>
-
-        <div class="form-group" id="confirm-password-group" style="display: none;">
-          <label for="confirm-password">Potwierdź hasło</label>
-          <div class="input-wrapper">
-            <input type="password" id="confirm-password" placeholder="••••••••">
-            <span class="toggle-password" id="toggle-pass2">👁️</span>
-          </div>
-        </div>
-
-        <button type="submit" class="btn" id="submit-btn">Zaloguj się</button>
+        <button type="submit" class="btn">Wejdź na stronę</button>
       </form>
-
-      <div class="toggle-auth">
-        <span id="toggle-link">Nie masz konta? Zarejestruj się</span>
-      </div>
     </div>
   </div>
 
@@ -253,7 +186,7 @@
       <div class="logo">RówneBaller</div>
       <div class="nav-right" style="display: flex; align-items: center;">
         <span class="user-info">Cześć, <strong id="user-display-name">Gracz</strong>!</span>
-        <button class="btn-logout" id="logout-btn">Wyloguj</button>
+        <button class="btn-change-nick" id="change-nick-btn">Zmień nick</button>
       </div>
     </nav>
 
@@ -268,158 +201,90 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
-      getAuth, 
-      createUserWithEmailAndPassword, 
-      signInWithEmailAndPassword, 
-      onAuthStateChanged,
-      signOut,
-      updateProfile
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { 
       getFirestore, 
       doc, 
       getDoc, 
       setDoc 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ⬇️ TUTAJ WKLEJ SWOJE DANE Z FIREBASE (PROJECT SETTINGS -> WEB APP) ⬇️
+    // ⬇️ TUTAJ WKLEJ SWOJE DANE Z FIREBASE (DANE MOŻESZ TEŻ ZOSTAWIĆ, JEŚLI CHCESZ TYLKO ZAPAMIĘTYWANIE W BROWSERZE) ⬇️
     const firebaseConfig = {
-      apiKey: "TUTAJ_WKLEJ_SWÓJ_API_KEY",
-      authDomain: "TUTAJ_WKLEJ_PROJECT_ID.firebaseapp.com",
-      projectId: "TUTAJ_WKLEJ_PROJECT_ID",
-      storageBucket: "TUTAJ_WKLEJ_PROJECT_ID.appspot.com",
-      messagingSenderId: "TUTAJ_WKLEJ_SENDER_ID",
-      appId: "TUTAJ_WKLEJ_APP_ID"
+      apiKey: "TWÓJ_API_KEY",
+      authDomain: "TWÓJ_PROJECT_ID.firebaseapp.com",
+      projectId: "TWÓJ_PROJECT_ID",
+      storageBucket: "TWÓJ_PROJECT_ID.appspot.com",
+      messagingSenderId: "TWÓJ_SENDER_ID",
+      appId: "TWÓJ_APP_ID"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    let db = null;
+    try {
+      const app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+    } catch(e) {
+      console.log("Firebase nie podpięty lub błędny key - tryb lokalny active");
+    }
 
-    let isSignUp = false;
-
-    // Elementy HTML
     const authScreen = document.getElementById('auth-screen');
     const appContent = document.getElementById('app-content');
-    const authForm = document.getElementById('auth-form');
-    const formTitle = document.getElementById('form-title');
-    const submitBtn = document.getElementById('submit-btn');
-    const toggleLink = document.getElementById('toggle-link');
-    const nameGroup = document.getElementById('name-group');
-    const confirmPasswordGroup = document.getElementById('confirm-password-group');
+    const nickForm = document.getElementById('nick-form');
     const errorMsg = document.getElementById('error-message');
-    const logoutBtn = document.getElementById('logout-btn');
     const userDisplayName = document.getElementById('user-display-name');
+    const changeNickBtn = document.getElementById('change-nick-btn');
 
-    const passInput = document.getElementById('password');
-    const confirmPassInput = document.getElementById('confirm-password');
-    const togglePass1 = document.getElementById('toggle-pass1');
-    const togglePass2 = document.getElementById('toggle-pass2');
+    // Sprawdzanie czy nick jest już zapisany w przeglądarce
+    const savedNick = localStorage.getItem('rowneballer_nick');
 
-    // Pokazywanie / Ukrywanie haseł
-    togglePass1.addEventListener('click', () => {
-      const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      passInput.setAttribute('type', type);
-    });
+    if (savedNick) {
+      showApp(savedNick);
+    }
 
-    togglePass2.addEventListener('click', () => {
-      const type = confirmPassInput.getAttribute('type') === 'password' ? 'text' : 'password';
-      confirmPassInput.setAttribute('type', type);
-    });
-
-    // Przełączanie Trybu (Logowanie <-> Rejestracja)
-    toggleLink.addEventListener('click', () => {
-      isSignUp = !isSignUp;
-      errorMsg.textContent = '';
-      authForm.reset();
-      if (isSignUp) {
-        formTitle.textContent = 'Zarejestruj się';
-        submitBtn.textContent = 'Stwórz konto';
-        toggleLink.textContent = 'Masz już konto? Zaloguj się';
-        nameGroup.style.display = 'block';
-        confirmPasswordGroup.style.display = 'block';
-      } else {
-        formTitle.textContent = 'Zaloguj się';
-        submitBtn.textContent = 'Zaloguj się';
-        toggleLink.textContent = 'Nie masz konta? Zarejestruj się';
-        nameGroup.style.display = 'none';
-        confirmPasswordGroup.style.display = 'none';
-      }
-    });
-
-    // Obsługa Wysyłania Formularza
-    authForm.addEventListener('submit', async (e) => {
+    // Obsługa formularza
+    nickForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorMsg.textContent = '';
+      const username = document.getElementById('username').value.trim();
 
-      const email = document.getElementById('email').value.trim();
-      const password = passInput.value;
+      if (!username) {
+        errorMsg.textContent = 'Wpisz prawidłowy nick!';
+        return;
+      }
 
-      if (isSignUp) {
-        const username = document.getElementById('username').value.trim();
-        const confirmPassword = confirmPassInput.value;
-
-        if (!username) {
-          errorMsg.textContent = 'Wpisz nazwę użytkownika!';
-          return;
-        }
-
-        if (password !== confirmPassword) {
-          errorMsg.textContent = 'Hasła nie są identyczne!';
-          return;
-        }
-
+      // Jeśli Firebase działa, sprawdzamy czy nick jest wolny
+      if (db && !firebaseConfig.apiKey.includes("TWÓJ_API_KEY")) {
         try {
-          // 1. Sprawdzenie czy nick jest zajęty w Firestore
           const usernameClean = username.toLowerCase();
           const userDocRef = doc(db, "usernames", usernameClean);
           const userDocSnap = await getDoc(userDocRef);
 
           if (userDocSnap.exists()) {
-            errorMsg.textContent = 'Ta nazwa użytkownika jest już zajęta. Wybierz inną!';
+            errorMsg.textContent = 'Ten nick jest już zajęty! Wybierz inny.';
             return;
           }
 
-          // 2. Rejestracja konta w Firebase Auth
-          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-          
-          // 3. Zapisanie nicku w profilu i bazie Firestore
-          await updateProfile(userCredential.user, { displayName: username });
-          await setDoc(userDocRef, { uid: userCredential.user.uid });
-
-        } catch (error) {
-          if (error.code === 'auth/email-already-in-use') {
-            errorMsg.textContent = 'Ten e-mail jest już zarejestrowany.';
-          } else if (error.code === 'auth/weak-password') {
-            errorMsg.textContent = 'Hasło musi mieć co najmniej 6 znaków.';
-          } else {
-            errorMsg.textContent = 'Błąd rejestracji: ' + error.message;
-          }
-        }
-      } else {
-        try {
-          await signInWithEmailAndPassword(auth, email, password);
-        } catch (error) {
-          errorMsg.textContent = 'Błąd logowania: Nieprawidłowy e-mail lub hasło.';
+          // Zapisujemy nick w Firebase
+          await setDoc(userDocRef, { created: new Date() });
+        } catch (err) {
+          console.error(err);
         }
       }
+
+      // Zapis w przeglądarce i wejście na stronę
+      localStorage.setItem('rowneballer_nick', username);
+      showApp(username);
     });
 
-    // Stan zalogowania
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        authScreen.style.display = 'none';
-        appContent.style.display = 'flex';
-        userDisplayName.textContent = user.displayName || 'Gracz';
-      } else {
-        authScreen.style.display = 'flex';
-        appContent.style.display = 'none';
-      }
-    });
+    function showApp(nick) {
+      userDisplayName.textContent = nick;
+      authScreen.style.display = 'none';
+      appContent.style.display = 'flex';
+    }
 
-    // Wylogowanie
-    logoutBtn.addEventListener('click', () => {
-      signOut(auth);
+    // Zmiana nicku / wylogowanie lokalne
+    changeNickBtn.addEventListener('click', () => {
+      localStorage.removeItem('rowneballer_nick');
+      authScreen.style.display = 'flex';
+      appContent.style.display = 'none';
     });
   </script>
 </body>
