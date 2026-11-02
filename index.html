@@ -96,6 +96,12 @@
       color: #38bdf8;
     }
 
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
     .user-info {
       font-size: 15px;
       color: #94a3b8;
@@ -105,6 +111,22 @@
       color: #38bdf8;
     }
 
+    .btn-create-nav {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .btn-create-nav:hover {
+      background: #0369a1;
+    }
+
     .btn-change-nick {
       background: #475569;
       padding: 6px 12px;
@@ -112,7 +134,6 @@
       color: white;
       border: none;
       cursor: pointer;
-      margin-left: 15px;
       font-size: 13px;
     }
 
@@ -150,27 +171,22 @@
       }
     }
 
-    /* MAŁE OKIENKO / PRZYCISK ROZWIJAJĄCY */
-    .toggle-dashboard-box {
-      background: #1e293b;
-      border: 1px solid #334155;
-      padding: 12px 24px;
-      border-radius: 8px;
+    .btn-next {
+      padding: 14px 40px;
+      font-size: 18px;
+      background: linear-gradient(135deg, #0284c7, #3b82f6);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-weight: bold;
       cursor: pointer;
-      font-size: 15px;
-      font-weight: 600;
-      color: #38bdf8;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .toggle-dashboard-box:hover {
-      background: #334155;
-      border-color: #38bdf8;
+    .btn-next:hover {
       transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
     }
 
     /* GŁÓWNE GUI QUIZÓW (UKRYTE DOMYŚLNIE) */
@@ -202,17 +218,17 @@
       align-items: center;
     }
 
-    .btn-close-dashboard {
+    .btn-back-home {
       background: #475569;
       color: white;
       border: none;
-      padding: 5px 10px;
+      padding: 5px 12px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 13px;
       cursor: pointer;
     }
 
-    .btn-close-dashboard:hover {
+    .btn-back-home:hover {
       background: #64748b;
     }
 
@@ -328,21 +344,20 @@
   <div id="app-content" style="display: none; flex-direction: column; min-height: 100vh;">
     <nav>
       <div class="logo">RówneBaller</div>
-      <div style="display: flex; align-items: center;">
+      <div class="nav-right">
+        <!-- Przycisk Stwórz Quiz w menu na górze -->
+        <button class="btn-create-nav" id="nav-create-btn">Stwórz Quiz</button>
         <span class="user-info">Cześć, <strong id="user-display-name">Gracz</strong>!</span>
         <button class="btn-change-nick" id="change-nick-btn">Zmień nick</button>
       </div>
     </nav>
 
-    <!-- 1. POWITANIE Z MAŁYM OKIENKIEM ROZWIJAJĄCYM -->
+    <!-- 1. POWITANIE Z PRZYCISKIEM PRZEJDŹ DALEJ -->
     <div id="welcome-screen">
       <h1 class="welcome-text">
         Witaj na stronie rowneballer rozwiązuj swoje quizy i walcz o nagrody więcej o tym masz w zakładce info-konkurs
       </h1>
-      <!-- Małe okienko / przycisk -->
-      <div class="toggle-dashboard-box" id="open-dashboard-btn">
-        ⚡ Stwórz quiz i zarządzaj quizami
-      </div>
+      <button class="btn-next" id="go-to-dashboard-btn">Przejdź dalej ➔</button>
     </div>
 
     <!-- 2. GŁÓWNE GUI QUIZÓW (PO KLIKNIĘCIU) -->
@@ -351,8 +366,8 @@
       <!-- TWÓRZ QUIZ -->
       <div class="section-card">
         <h2 class="section-title">
-          Stwórz własny Quiz
-          <button class="btn-close-dashboard" id="close-dashboard-btn">Zamknij panel</button>
+          <span>Stwórz Quiz</span>
+          <button class="btn-back-home" id="back-to-home-btn">← Powrót</button>
         </h2>
         <form id="create-quiz-form" class="create-grid">
           
@@ -420,8 +435,9 @@
     const userDisplayName = document.getElementById('user-display-name');
     const changeNickBtn = document.getElementById('change-nick-btn');
     
-    const openDashboardBtn = document.getElementById('open-dashboard-btn');
-    const closeDashboardBtn = document.getElementById('close-dashboard-btn');
+    const goToDashboardBtn = document.getElementById('go-to-dashboard-btn');
+    const navCreateBtn = document.getElementById('nav-create-btn');
+    const backToHomeBtn = document.getElementById('back-to-home-btn');
     
     const createQuizForm = document.getElementById('create-quiz-form');
     const quizContainer = document.getElementById('quiz-container');
@@ -460,13 +476,16 @@
       renderQuizzes();
     }
 
-    // Otwieranie i zamykanie panelu quizów
-    openDashboardBtn.addEventListener('click', () => {
+    // Przechodzenie między ekranami
+    function openDashboard() {
       welcomeScreen.style.display = 'none';
       dashboardScreen.style.display = 'flex';
-    });
+    }
 
-    closeDashboardBtn.addEventListener('click', () => {
+    goToDashboardBtn.addEventListener('click', openDashboard);
+    navCreateBtn.addEventListener('click', openDashboard);
+
+    backToHomeBtn.addEventListener('click', () => {
       dashboardScreen.style.display = 'none';
       welcomeScreen.style.display = 'flex';
     });
