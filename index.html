@@ -466,11 +466,10 @@
       </div>
 
       <div class="form-group" style="text-align: left;">
-        <label>Zmień zdjęcie profilowe (URL grafiki)</label>
-        <input type="url" id="new-avatar-url" placeholder="https://example.com/zdjecie.jpg">
+        <label>Wybierz zdjęcie profilowe z dysku:</label>
+        <input type="file" id="avatar-file-input" accept="image/*">
       </div>
-      <button class="btn" id="save-profile-btn" style="margin-bottom: 15px;">Zapisz zmiany profilu</button>
-      <button class="btn" id="change-nick-btn" style="background: #64748b;">Wyloguj / Zmień nick</button>
+      <button class="btn" id="change-nick-btn" style="background: #64748b; margin-top: 10px;">Wyloguj / Zmień nick</button>
     </div>
   </div>
 
@@ -524,8 +523,7 @@
     const profileRank = document.getElementById('profile-rank');
     const profileCompleted = document.getElementById('profile-completed');
     const profileAvatarPreview = document.getElementById('profile-avatar-preview');
-    const newAvatarUrl = document.getElementById('new-avatar-url');
-    const saveProfileBtn = document.getElementById('save-profile-btn');
+    const avatarFileInput = document.getElementById('avatar-file-input');
     const changeNickBtn = document.getElementById('change-nick-btn');
 
     const goToDashboardBtn = document.getElementById('go-to-dashboard-btn');
@@ -552,7 +550,7 @@
       completedQuizzes: 0
     };
 
-    // 8 QUIZÓW - 1 QUIZ Z TWOIMI DOKŁADNYMI PYTANIAMI (10 PKT / 2 PKT ZA PYTANIE)
+    // 8 QUIZÓW - 1 QUIZ Z POPRAWIONYMI ODPOWIEDZIAMI NA 100%
     let quizy = [
       {
         id: 1,
@@ -562,7 +560,7 @@
           { question: "2. Na jakiej platformie jesteśmy?", options: ["A. TikTok", "B. Instagram", "C. YouTube", "D. Twitch"], correct: 0 },
           { question: "3. Ilu jest członków?", options: ["A. 4", "B. 5", "C. 6", "D. 7"], correct: 3 },
           { question: "4. Jaki tytuł ma najpopularniejszy film?", options: ["A. 5 piłek 5 strzałów", "B. Dzień 9 strzelania karnych z fllys", "C. Dzień 1 robienia kapek", "D. Wpadanie do basenu"], correct: 0 },
-          { question: "5. Jaka była najdłuższa przerwa na kanale?", options: ["A. Tydzień", "B. 1 miesiąc", "C. 3 miesiące", "D. Rok"], correct: 2 }
+          { question: "5. Kto wpadał do basenu?", options: ["A. rafi | romun", "B. pomi | romun", "C. juri | rafi", "D. dymek | pomi"], correct: 1 }
         ],
         active: true,
         img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop"
@@ -610,11 +608,11 @@
       renderQuizzes();
     }
 
-    // Obsługa Profilu GUI
+    // Obsługa Profilu GUI i wczytywania zdjęcia z dysku
     openProfileBtn.addEventListener('click', () => {
       profileNick.textContent = userStats.nick;
       profilePoints.textContent = userStats.points + " pkt";
-      profileRank.textContent = "#1"; // symulacja tabeli liderów
+      profileRank.textContent = "#1";
       profileCompleted.textContent = userStats.completedQuizzes;
       profileAvatarPreview.src = userStats.avatar;
       profileModalOverlay.style.display = 'flex';
@@ -622,16 +620,20 @@
 
     closeProfileBtn.addEventListener('click', () => profileModalOverlay.style.display = 'none');
 
-    saveProfileBtn.addEventListener('click', () => {
-      const newUrl = newAvatarUrl.value.trim();
-      if (newUrl) {
-        userStats.avatar = newUrl;
-        localStorage.setItem('rowneballer_avatar', newUrl);
-        navAvatar.src = newUrl;
-        profileAvatarPreview.src = newUrl;
-        alert('Zdjęcie profilowe zostało zaktualizowane!');
+    avatarFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const base64Image = event.target.result;
+          userStats.avatar = base64Image;
+          localStorage.setItem('rowneballer_avatar', base64Image);
+          navAvatar.src = base64Image;
+          profileAvatarPreview.src = base64Image;
+          alert('Zdjęcie profilowe zostało zmienione!');
+        };
+        reader.readAsDataURL(file);
       }
-      profileModalOverlay.style.display = 'none';
     });
 
     goToDashboardBtn.addEventListener('click', () => {
@@ -748,7 +750,7 @@
       if (currentQIndex < currentQuiz.questions.length) {
         showQuestion();
       } else {
-        const earnedPoints = correctAnswersCount * 2; // 2 pkt za każde pytanie (max 10)
+        const earnedPoints = correctAnswersCount * 2;
         userStats.points += earnedPoints;
         userStats.completedQuizzes++;
         
