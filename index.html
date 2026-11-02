@@ -1,1 +1,343 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RówneBaller - Quizy Piłkarskie</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* KONTENER LOGOWANIA / REJESTRACJI */
+    .auth-container {
+      max-width: 400px;
+      margin: auto;
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      width: 90%;
+    }
+
+    .auth-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #38bdf8;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #38bdf8;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #0284c7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #0369a1;
+    }
+
+    .toggle-auth {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .toggle-auth span {
+      color: #38bdf8;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .error-msg {
+      color: #ef4444;
+      font-size: 13px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    /* GLOWNA ZAWARTOSC PO ZALOGOWANIU */
+    #app-content {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    nav {
+      background: #1e293b;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #334155;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: #38bdf8;
+    }
+
+    .btn-logout {
+      background: #dc2626;
+      padding: 6px 12px;
+      border-radius: 4px;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-left: 20px;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* ANIMACJA TEKSTU POWITALNEGO */
+    .welcome-text {
+      font-size: 28px;
+      font-weight: 700;
+      max-width: 800px;
+      line-height: 1.4;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #38bdf8);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      animation: shine 4s linear infinite;
+    }
+
+    @keyframes shine {
+      to {
+        background-position: 200% center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- EKRAN AUTORYZACJI -->
+  <div id="auth-screen" style="display: flex; min-height: 100vh; width: 100%;">
+    <div class="auth-container">
+      <h2 id="form-title">Zaloguj się</h2>
+      <div id="error-message" class="error-msg"></div>
+      
+      <form id="auth-form">
+        <div class="form-group" id="name-group" style="display: none;">
+          <label for="username">Nazwa użytkownika</label>
+          <input type="text" id="username" placeholder="Twój nick">
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" required placeholder="twoj@email.com">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Hasło</label>
+          <input type="password" id="password" required placeholder="••••••••">
+        </div>
+
+        <div class="form-group" id="confirm-password-group" style="display: none;">
+          <label for="confirm-password">Potwierdź hasło</label>
+          <input type="password" id="confirm-password" placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="btn" id="submit-btn">Zaloguj się</button>
+      </form>
+
+      <div class="toggle-auth">
+        <span id="toggle-link">Nie masz konta? Zarejestruj się</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRONA GLÓWNA (WIDOCZNA PO ZALOGOWANIU) -->
+  <div id="app-content">
+    <nav>
+      <div class="logo">RówneBaller</div>
+      <div class="nav-links">
+        <a href="#">Strona Główna</a>
+        <a href="#">Quizy</a>
+        <a href="#">Info-Konkurs</a>
+        <button class="btn-logout" id="logout-btn">Wyloguj</button>
+      </div>
+    </nav>
+
+    <main>
+      <h1 class="welcome-text">
+        Witaj na stronie rowneballer rozwiązuj swoje quizy i walcz o nagrody więcej o tym masz w zakładce info-konkurs
+      </h1>
+    </main>
+  </div>
+
+  <!-- FIREBASE INTEGRACJA -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      onAuthStateChanged,
+      signOut,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // KROK DLA CIEBIE: Podmień ponizsze dane danymi ze swojego projektu Firebase!
+    const firebaseConfig = {
+      apiKey: "TWÓJ_API_KEY",
+      authDomain: "TWÓJ_PROJECT_ID.firebaseapp.com",
+      projectId: "TWÓJ_PROJECT_ID",
+      storageBucket: "TWÓJ_PROJECT_ID.appspot.com",
+      messagingSenderId: "TWÓJ_SENDER_ID",
+      appId: "TWÓJ_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    let isSignUp = false;
+
+    const authScreen = document.getElementById('auth-screen');
+    const appContent = document.getElementById('app-content');
+    const authForm = document.getElementById('auth-form');
+    const formTitle = document.getElementById('form-title');
+    const submitBtn = document.getElementById('submit-btn');
+    const toggleLink = document.getElementById('toggle-link');
+    const nameGroup = document.getElementById('name-group');
+    const confirmPasswordGroup = document.getElementById('confirm-password-group');
+    const errorMsg = document.getElementById('error-message');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    // Przełączanie między Logowaniem a Rejestracją
+    toggleLink.addEventListener('click', () => {
+      isSignUp = !isSignUp;
+      errorMsg.textContent = '';
+      if (isSignUp) {
+        formTitle.textContent = 'Zarejestruj się';
+        submitBtn.textContent = 'Stwórz konto';
+        toggleLink.textContent = 'Masz już konto? Zaloguj się';
+        nameGroup.style.display = 'block';
+        confirmPasswordGroup.style.display = 'block';
+      } else {
+        formTitle.textContent = 'Zaloguj się';
+        submitBtn.textContent = 'Zaloguj się';
+        toggleLink.textContent = 'Nie masz konta? Zarejestruj się';
+        nameGroup.style.display = 'none';
+        confirmPasswordGroup.style.display = 'none';
+      }
+    });
+
+    // Obsługa Formularza
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorMsg.textContent = '';
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (isSignUp) {
+        const username = document.getElementById('username').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (!username) {
+          errorMsg.textContent = 'Wpisz nazwę użytkownika!';
+          return;
+        }
+
+        if (password !== confirmPassword) {
+          errorMsg.textContent = 'Hasła nie są identyczne!';
+          return;
+        }
+
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+          await updateProfile(userCredential.user, { displayName: username });
+        } catch (error) {
+          errorMsg.textContent = 'Błąd rejestracji: ' + error.message;
+        }
+      } else {
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+        } catch (error) {
+          errorMsg.textContent = 'Błąd logowania: Sprawdź e-mail i hasło.';
+        }
+      }
+    });
+
+    // Obsługa stanu zalogowania
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authScreen.style.display = 'none';
+        appContent.style.display = 'flex';
+      } else {
+        authScreen.style.display = 'flex';
+        appContent.style.display = 'none';
+      }
+    });
+
+    // Wylogowanie
+    logoutBtn.addEventListener('click', () => {
+      signOut(auth);
+    });
+  </script>
+</body>
+</html>
