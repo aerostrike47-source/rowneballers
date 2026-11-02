@@ -207,14 +207,6 @@
       border: 1px solid #334155;
     }
 
-    .section-title {
-      font-size: 22px;
-      color: #38bdf8;
-      margin-bottom: 20px;
-      border-bottom: 2px solid #334155;
-      padding-bottom: 10px;
-    }
-
     /* MODAL / OKIENKO TWORZENIA QUIZU */
     #modal-overlay {
       display: none;
@@ -223,11 +215,12 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.8);
       z-index: 100;
       justify-content: center;
       align-items: center;
       padding: 20px;
+      overflow-y: auto;
     }
 
     .modal-content {
@@ -236,7 +229,9 @@
       padding: 30px;
       border-radius: 12px;
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: 0 15px 30px rgba(0,0,0,0.6);
       position: relative;
     }
@@ -248,7 +243,7 @@
       background: transparent;
       border: none;
       color: #94a3b8;
-      font-size: 20px;
+      font-size: 22px;
       cursor: pointer;
     }
 
@@ -256,30 +251,33 @@
       color: #fff;
     }
 
-    /* FORMULARZ TWORZENIA QUIZU */
-    .create-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
+    .question-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
     }
 
-    .full-width {
-      grid-column: span 2;
+    .question-box h4 {
+      color: #38bdf8;
+      margin-bottom: 10px;
+      font-size: 16px;
     }
 
     .options-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
+      gap: 8px;
+      margin-top: 8px;
     }
 
     .option-input-group {
       display: flex;
       align-items: center;
-      gap: 10px;
-      background: #0f172a;
-      padding: 8px 12px;
+      gap: 8px;
+      background: #1e293b;
+      padding: 6px 10px;
       border-radius: 6px;
       border: 1px solid #334155;
     }
@@ -290,6 +288,7 @@
       color: #fff;
       width: 100%;
       outline: none;
+      font-size: 14px;
     }
 
     /* LISTA QUIZÓW */
@@ -398,52 +397,25 @@
     </div>
   </div>
 
-  <!-- MODAL / ODDZIELNE OKIENKO DO TWORZENIA QUIZU -->
+  <!-- MODAL / OKIENKO TWORZENIA QUIZU (MIN 5 PYTAŃ) -->
   <div id="modal-overlay">
     <div class="modal-content">
       <button class="btn-close-modal" id="close-modal-btn">&times;</button>
-      <h2 style="color: #38bdf8; margin-bottom: 20px;">Stwórz Quiz tutaj</h2>
+      <h2 style="color: #38bdf8; margin-bottom: 10px;">Stwórz Quiz</h2>
+      <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">Twój quiz musi zawierać **minimum 5 pytań**.</p>
       
-      <form id="create-quiz-form" class="create-grid">
-        <div class="form-group full-width">
-          <label>Nazwa Quizu</label>
+      <form id="create-quiz-form">
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label style="font-weight: bold; color: #38bdf8;">Nazwa Quizu</label>
           <input type="text" id="quiz-title" placeholder="np. Mój quiz piłkarski" required>
         </div>
 
-        <div class="form-group full-width">
-          <label>Pytanie</label>
-          <input type="text" id="quiz-question" placeholder="Wpisz treść pytania" required>
-        </div>
+        <!-- Tutaj generują się pytania (min 5) -->
+        <div id="questions-container"></div>
 
-        <div class="form-group full-width">
-          <label>Adres URL Grafiki (opcjonalnie)</label>
-          <input type="url" id="quiz-image" placeholder="https://example.com/zdjecie.jpg">
-        </div>
-
-        <div class="form-group full-width">
-          <label>4 Opcje odpowiedzi (zaznacz kropeczką prawidłową):</label>
-          <div class="options-grid">
-            <div class="option-input-group">
-              <input type="radio" name="correct-opt" value="0" checked>
-              <input type="text" class="opt-text" placeholder="Opcja A" required>
-            </div>
-            <div class="option-input-group">
-              <input type="radio" name="correct-opt" value="1">
-              <input type="text" class="opt-text" placeholder="Opcja B" required>
-            </div>
-            <div class="option-input-group">
-              <input type="radio" name="correct-opt" value="2">
-              <input type="text" class="opt-text" placeholder="Opcja C" required>
-            </div>
-            <div class="option-input-group">
-              <input type="radio" name="correct-opt" value="3">
-              <input type="text" class="opt-text" placeholder="Opcja D" required>
-            </div>
-          </div>
-        </div>
-
-        <div class="full-width" style="margin-top: 10px;">
-          <button type="submit" class="btn" style="background: #10b981;">Dodaj Quiz do listy</button>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn" id="add-question-btn" style="background: #334155; flex: 1;">+ Dodaj kolejne pytanie</button>
+          <button type="submit" class="btn" style="background: #10b981; flex: 1;">Zapisz Quiz (Minimum 5 pytań)</button>
         </div>
       </form>
     </div>
@@ -467,6 +439,8 @@
     const modalOverlay = document.getElementById('modal-overlay');
     
     const createQuizForm = document.getElementById('create-quiz-form');
+    const questionsContainer = document.getElementById('questions-container');
+    const addQuestionBtn = document.getElementById('add-question-btn');
     const quizContainer = document.getElementById('quiz-container');
 
     // 8 domyślnych quizów (1 aktywny, 7 wolnych)
@@ -474,19 +448,23 @@
       {
         id: 1,
         title: "1. Historia RówneBaller",
-        question: "W którym roku powstał kanał TikTok RówneBaller?",
-        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop",
-        options: ["2021", "2022", "2023", "2024"],
-        correct: 2,
+        questions: [
+          {
+            question: "W którym roku powstał kanał TikTok RówneBaller?",
+            img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop",
+            options: ["2021", "2022", "2023", "2024"],
+            correct: 2
+          }
+        ],
         active: true
       },
-      { id: 2, title: "2. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
-      { id: 3, title: "3. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
-      { id: 4, title: "4. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
-      { id: 5, title: "5. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
-      { id: 6, title: "6. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
-      { id: 7, title: "7. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false },
-      { id: 8, title: "8. Wolne", question: "Brak pytania", img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", active: false }
+      { id: 2, title: "2. Wolne", active: false },
+      { id: 3, title: "3. Wolne", active: false },
+      { id: 4, title: "4. Wolne", active: false },
+      { id: 5, title: "5. Wolne", active: false },
+      { id: 6, title: "6. Wolne", active: false },
+      { id: 7, title: "7. Wolne", active: false },
+      { id: 8, title: "8. Wolne", active: false }
     ];
 
     const savedNick = localStorage.getItem('rowneballer_nick');
@@ -523,6 +501,7 @@
     // Obsługa okienka (modala) tworzenia quizu
     openModalBtn.addEventListener('click', () => {
       modalOverlay.style.display = 'flex';
+      initQuestionsForm(); // Generuje startowe 5 pytań
     });
 
     closeModalBtn.addEventListener('click', () => {
@@ -543,6 +522,55 @@
       dashboardScreen.style.display = 'none';
     });
 
+    // Inicjalizacja formularza z 5 pytaniami
+    function initQuestionsForm() {
+      questionsContainer.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        addQuestionBlock(i);
+      }
+    }
+
+    function addQuestionBlock(num) {
+      const div = document.createElement('div');
+      div.className = 'question-box';
+      div.innerHTML = `
+        <h4>Pytanie ${num}</h4>
+        <div class="form-group" style="margin-bottom: 10px;">
+          <label>Treść pytania</label>
+          <input type="text" class="q-text" placeholder="Wpisz pytanie nr ${num}" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 10px;">
+          <label>Adres URL grafiki (opcjonalnie)</label>
+          <input type="url" class="q-img" placeholder="https://example.com/zdjecie.jpg">
+        </div>
+        <label style="font-size: 13px; color: #94a3b8;">4 Opcje (zaznacz kropeczką prawidłową):</label>
+        <div class="options-grid">
+          <div class="option-input-group">
+            <input type="radio" name="correct-${num}" value="0" checked>
+            <input type="text" class="q-opt-0" placeholder="Opcja A" required>
+          </div>
+          <div class="option-input-group">
+            <input type="radio" name="correct-${num}" value="1">
+            <input type="text" class="q-opt-1" placeholder="Opcja B" required>
+          </div>
+          <div class="option-input-group">
+            <input type="radio" name="correct-${num}" value="2">
+            <input type="text" class="q-opt-2" placeholder="Opcja C" required>
+          </div>
+          <div class="option-input-group">
+            <input type="radio" name="correct-${num}" value="3">
+            <input type="text" class="q-opt-3" placeholder="Opcja D" required>
+          </div>
+        </div>
+      `;
+      questionsContainer.appendChild(div);
+    }
+
+    addQuestionBtn.addEventListener('click', () => {
+      const currentCount = questionsContainer.querySelectorAll('.question-box').length + 1;
+      addQuestionBlock(currentCount);
+    });
+
     function renderQuizzes() {
       quizContainer.innerHTML = '';
       quizy.forEach(q => {
@@ -550,17 +578,18 @@
         card.className = 'quiz-card';
         
         if (q.active) {
+          const firstImg = q.questions && q.questions[0] && q.questions[0].img ? q.questions[0].img : 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop';
           card.innerHTML = `
-            <img src="${q.img}" alt="Quiz Image">
+            <img src="${firstImg}" alt="Quiz Image">
             <div class="quiz-card-content">
               <div class="quiz-card-title">${q.title}</div>
-              <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">${q.question}</p>
+              <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;">Liczba pytań: ${q.questions.length}</p>
               <button class="btn-play" onclick="alert('Startujemy quiz: ${q.title}!')">Zagraj</button>
             </div>
           `;
         } else {
           card.innerHTML = `
-            <img src="${q.img}" alt="Wolne miejsce" style="opacity: 0.3;">
+            <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop" alt="Wolne miejsce" style="opacity: 0.3;">
             <div class="quiz-card-content" style="align-items: center; justify-content: center; text-align: center;">
               <div class="quiz-card-title" style="color: #64748b;">${q.title}</div>
               <p style="font-size: 12px; color: #475569;">Wolne miejsce</p>
@@ -575,12 +604,30 @@
       e.preventDefault();
       
       const title = document.getElementById('quiz-title').value;
-      const question = document.getElementById('quiz-question').value;
-      const img = document.getElementById('quiz-image').value || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop';
+      const questionBoxes = questionsContainer.querySelectorAll('.question-box');
       
-      const optionInputs = document.querySelectorAll('.opt-text');
-      const options = Array.from(optionInputs).map(i => i.value);
-      const correctRadio = document.querySelector('input[name="correct-opt"]:checked').value;
+      if (questionBoxes.length < 5) {
+        alert('Quiz musi zawierać minimum 5 pytań!');
+        return;
+      }
+
+      let questionsList = [];
+      questionBoxes.forEach((box, index) => {
+        const qText = box.querySelector('.q-text').value;
+        const qImg = box.querySelector('.q-img').value || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop';
+        const opt0 = box.querySelector('.q-opt-0').value;
+        const opt1 = box.querySelector('.q-opt-1').value;
+        const opt2 = box.querySelector('.q-opt-2').value;
+        const opt3 = box.querySelector('.q-opt-3').value;
+        const correctVal = box.querySelector(`input[name="correct-${index + 1}"]:checked`).value;
+
+        questionsList.push({
+          question: qText,
+          img: qImg,
+          options: [opt0, opt1, opt2, opt3],
+          correct: parseInt(correctVal)
+        });
+      });
 
       const firstFreeIndex = quizy.findIndex(q => !q.active);
       
@@ -588,20 +635,14 @@
         quizy[firstFreeIndex] = {
           id: firstFreeIndex + 1,
           title: `${firstFreeIndex + 1}. ${title}`,
-          question: question,
-          img: img,
-          options: options,
-          correct: parseInt(correctRadio),
+          questions: questionsList,
           active: true
         };
       } else {
         quizy.push({
           id: quizy.length + 1,
           title: `${quizy.length + 1}. ${title}`,
-          question: question,
-          img: img,
-          options: options,
-          correct: parseInt(correctRadio),
+          questions: questionsList,
           active: true
         });
       }
@@ -609,7 +650,7 @@
       renderQuizzes();
       createQuizForm.reset();
       modalOverlay.style.display = 'none';
-      alert('Twój quiz został dodany do listy!');
+      alert('Twój quiz z 5+ pytaniami został pomyślnie dodany!');
     });
   </script>
 </body>
