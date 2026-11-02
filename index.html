@@ -251,7 +251,7 @@
   <div id="app-content">
     <nav>
       <div class="logo">RówneBaller</div>
-      <div class="nav-right">
+      <div class="nav-right" style="display: flex; align-items: center;">
         <span class="user-info">Cześć, <strong id="user-display-name">Gracz</strong>!</span>
         <button class="btn-logout" id="logout-btn">Wyloguj</button>
       </div>
@@ -282,14 +282,14 @@
       setDoc 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // KROK DLA CIEBIE: Podmień ponizsze dane danymi ze swojego projektu Firebase!
+    // ⬇️ TUTAJ WKLEJ SWOJE DANE Z FIREBASE (PROJECT SETTINGS -> WEB APP) ⬇️
     const firebaseConfig = {
-      apiKey: "TWÓJ_API_KEY",
-      authDomain: "TWÓJ_PROJECT_ID.firebaseapp.com",
-      projectId: "TWÓJ_PROJECT_ID",
-      storageBucket: "TWÓJ_PROJECT_ID.appspot.com",
-      messagingSenderId: "TWÓJ_SENDER_ID",
-      appId: "TWÓJ_APP_ID"
+      apiKey: "TUTAJ_WKLEJ_SWÓJ_API_KEY",
+      authDomain: "TUTAJ_WKLEJ_PROJECT_ID.firebaseapp.com",
+      projectId: "TUTAJ_WKLEJ_PROJECT_ID",
+      storageBucket: "TUTAJ_WKLEJ_PROJECT_ID.appspot.com",
+      messagingSenderId: "TUTAJ_WKLEJ_SENDER_ID",
+      appId: "TUTAJ_WKLEJ_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
