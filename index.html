@@ -20,7 +20,7 @@
       flex-direction: column;
     }
 
-    /* WEJŚCIE / NICK */
+    /* EKRAN ENTER / NICK */
     .auth-container {
       max-width: 400px;
       margin: auto;
@@ -80,20 +80,7 @@
       background: #0369a1;
     }
 
-    .error-msg {
-      color: #ef4444;
-      font-size: 13px;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-
-    /* STRONA GŁÓWNA */
-    #app-content {
-      display: none;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
+    /* NAWIGACJA */
     nav {
       background: #1e293b;
       padding: 15px 30px;
@@ -133,9 +120,11 @@
       background: #64748b;
     }
 
-    main {
+    /* EKRAN POWITALNY (HERO) */
+    #welcome-screen {
       flex: 1;
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
@@ -152,6 +141,7 @@
       color: transparent;
       -webkit-background-clip: text;
       animation: shine 4s linear infinite;
+      margin-bottom: 30px;
     }
 
     @keyframes shine {
@@ -159,132 +149,345 @@
         background-position: 200% center;
       }
     }
+
+    .btn-next {
+      padding: 14px 40px;
+      font-size: 18px;
+      background: linear-gradient(135deg, #0284c7, #3b82f6);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-next:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+    }
+
+    /* GŁÓWNE GUI QUIZÓW */
+    #dashboard-screen {
+      display: none;
+      padding: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .section-card {
+      background: #1e293b;
+      padding: 25px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+
+    .section-title {
+      font-size: 22px;
+      color: #38bdf8;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #334155;
+      padding-bottom: 10px;
+    }
+
+    /* FORMULARZ TWORZENIA QUIZU */
+    .create-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .option-input-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #0f172a;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+    }
+
+    .option-input-group input[type="text"] {
+      background: transparent;
+      border: none;
+      color: #fff;
+      width: 100%;
+      outline: none;
+    }
+
+    /* LISTA QUIZÓW */
+    .quiz-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .quiz-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .quiz-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .quiz-card-content {
+      padding: 15px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .quiz-card-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #f8fafc;
+      margin-bottom: 10px;
+    }
+
+    .btn-play {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background 0.2s;
+    }
+
+    .btn-play:hover {
+      background: #059669;
+    }
   </style>
 </head>
 <body>
 
-  <!-- EKRAN PODAWANIA NICKU -->
+  <!-- EKRAN ENTER / NICK -->
   <div id="auth-screen" style="display: flex; min-height: 100vh; width: 100%;">
     <div class="auth-container">
       <h2>Wpisz swój Nick</h2>
-      <div id="error-message" class="error-msg"></div>
+      <div id="error-message" style="color: #ef4444; font-size: 13px; margin-bottom: 15px; text-align: center;"></div>
       
       <form id="nick-form">
         <div class="form-group">
           <label for="username">Twój unikalny nick do quizów:</label>
           <input type="text" id="username" placeholder="np. Baller10" required>
         </div>
-
         <button type="submit" class="btn">Wejdź na stronę</button>
       </form>
     </div>
   </div>
 
-  <!-- STRONA GŁÓWNA -->
-  <div id="app-content">
+  <!-- CONTAINER KONTENTU -->
+  <div id="app-content" style="display: none; flex-direction: column; min-height: 100vh;">
     <nav>
       <div class="logo">RówneBaller</div>
-      <div class="nav-right" style="display: flex; align-items: center;">
+      <div style="display: flex; align-items: center;">
         <span class="user-info">Cześć, <strong id="user-display-name">Gracz</strong>!</span>
         <button class="btn-change-nick" id="change-nick-btn">Zmień nick</button>
       </div>
     </nav>
 
-    <main>
+    <!-- 1. POWITANIE Z PRZYCISKIEM PRZEJDŹ DALEJ -->
+    <div id="welcome-screen">
       <h1 class="welcome-text">
         Witaj na stronie rowneballer rozwiązuj swoje quizy i walcz o nagrody więcej o tym masz w zakładce info-konkurs
       </h1>
-    </main>
+      <button class="btn-next" id="go-to-dashboard-btn">Przejdź dalej ➔</button>
+    </div>
+
+    <!-- 2. GŁÓWNE GUI QUIZÓW -->
+    <div id="dashboard-screen">
+      
+      <!-- TWÓRZ QUIZ -->
+      <div class="section-card">
+        <h2 class="section-title">Stwórz własny Quiz</h2>
+        <form id="create-quiz-form" class="create-grid">
+          
+          <div class="form-group full-width">
+            <label>Nazwa Quizu</label>
+            <input type="text" id="quiz-title" placeholder="np. Historia RówneBaller" required>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Pytanie</label>
+            <input type="text" id="quiz-question" placeholder="Wpisz treść pytania" required>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Adres URL Grafiki (opcjonalnie)</label>
+            <input type="url" id="quiz-image" placeholder="https://example.com/zdjecie.jpg">
+          </div>
+
+          <div class="form-group full-width">
+            <label>4 Opcje odpowiedzi (zaznacz kropeczką prawidłową):</label>
+            <div class="options-grid">
+              <div class="option-input-group">
+                <input type="radio" name="correct-opt" value="0" checked>
+                <input type="text" class="opt-text" placeholder="Opcja A" required>
+              </div>
+              <div class="option-input-group">
+                <input type="radio" name="correct-opt" value="1">
+                <input type="text" class="opt-text" placeholder="Opcja B" required>
+              </div>
+              <div class="option-input-group">
+                <input type="radio" name="correct-opt" value="2">
+                <input type="text" class="opt-text" placeholder="Opcja C" required>
+              </div>
+              <div class="option-input-group">
+                <input type="radio" name="correct-opt" value="3">
+                <input type="text" class="opt-text" placeholder="Opcja D" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="full-width">
+            <button type="submit" class="btn" style="background: #10b981;">Dodaj Quiz</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- NASZE QUIZY -->
+      <div class="section-card">
+        <h2 class="section-title">Nasze Quizy</h2>
+        <div class="quiz-list" id="quiz-container">
+          <!-- Quizy generują się automatycznie -->
+        </div>
+      </div>
+
+    </div>
   </div>
 
-  <!-- FIREBASE INTEGRACJA -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      setDoc 
-    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-    // ⬇️ TUTAJ WKLEJ SWOJE DANE Z FIREBASE (DANE MOŻESZ TEŻ ZOSTAWIĆ, JEŚLI CHCESZ TYLKO ZAPAMIĘTYWANIE W BROWSERZE) ⬇️
-    const firebaseConfig = {
-      apiKey: "TWÓJ_API_KEY",
-      authDomain: "TWÓJ_PROJECT_ID.firebaseapp.com",
-      projectId: "TWÓJ_PROJECT_ID",
-      storageBucket: "TWÓJ_PROJECT_ID.appspot.com",
-      messagingSenderId: "TWÓJ_SENDER_ID",
-      appId: "TWÓJ_APP_ID"
-    };
-
-    let db = null;
-    try {
-      const app = initializeApp(firebaseConfig);
-      db = getFirestore(app);
-    } catch(e) {
-      console.log("Firebase nie podpięty lub błędny key - tryb lokalny active");
-    }
-
+  <script>
     const authScreen = document.getElementById('auth-screen');
     const appContent = document.getElementById('app-content');
+    const welcomeScreen = document.getElementById('welcome-screen');
+    const dashboardScreen = document.getElementById('dashboard-screen');
+    
     const nickForm = document.getElementById('nick-form');
-    const errorMsg = document.getElementById('error-message');
     const userDisplayName = document.getElementById('user-display-name');
     const changeNickBtn = document.getElementById('change-nick-btn');
+    const goToDashboardBtn = document.getElementById('go-to-dashboard-btn');
+    
+    const createQuizForm = document.getElementById('create-quiz-form');
+    const quizContainer = document.getElementById('quiz-container');
 
-    // Sprawdzanie czy nick jest już zapisany w przeglądarce
+    // Domyślne quizy (w tym Quiz Historia RówneBaller)
+    let quizy = [
+      {
+        id: 1,
+        title: "Historia RówneBaller",
+        question: "W którym roku powstał kanał TikTok RówneBaller?",
+        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop",
+        options: ["2021", "2022", "2023", "2024"],
+        correct: 2
+      }
+    ];
+
+    // Sprawdzanie zapamiętanego nicku
     const savedNick = localStorage.getItem('rowneballer_nick');
-
     if (savedNick) {
       showApp(savedNick);
     }
 
-    // Obsługa formularza
-    nickForm.addEventListener('submit', async (e) => {
+    nickForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      errorMsg.textContent = '';
       const username = document.getElementById('username').value.trim();
-
-      if (!username) {
-        errorMsg.textContent = 'Wpisz prawidłowy nick!';
-        return;
+      if (username) {
+        localStorage.setItem('rowneballer_nick', username);
+        showApp(username);
       }
-
-      // Jeśli Firebase działa, sprawdzamy czy nick jest wolny
-      if (db && !firebaseConfig.apiKey.includes("TWÓJ_API_KEY")) {
-        try {
-          const usernameClean = username.toLowerCase();
-          const userDocRef = doc(db, "usernames", usernameClean);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (userDocSnap.exists()) {
-            errorMsg.textContent = 'Ten nick jest już zajęty! Wybierz inny.';
-            return;
-          }
-
-          // Zapisujemy nick w Firebase
-          await setDoc(userDocRef, { created: new Date() });
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      // Zapis w przeglądarce i wejście na stronę
-      localStorage.setItem('rowneballer_nick', username);
-      showApp(username);
     });
 
     function showApp(nick) {
       userDisplayName.textContent = nick;
       authScreen.style.display = 'none';
       appContent.style.display = 'flex';
+      renderQuizzes();
     }
 
-    // Zmiana nicku / wylogowanie lokalne
+    // Nawigacja Przejdź Dalej
+    goToDashboardBtn.addEventListener('click', () => {
+      welcomeScreen.style.display = 'none';
+      dashboardScreen.style.display = 'flex';
+    });
+
     changeNickBtn.addEventListener('click', () => {
       localStorage.removeItem('rowneballer_nick');
       authScreen.style.display = 'flex';
       appContent.style.display = 'none';
+      welcomeScreen.style.display = 'flex';
+      dashboardScreen.style.display = 'none';
+    });
+
+    // Renderowanie Listy Quizów
+    function renderQuizzes() {
+      quizContainer.innerHTML = '';
+      quizy.forEach(q => {
+        const card = document.createElement('div');
+        card.className = 'quiz-card';
+        card.innerHTML = `
+          <img src="${q.img || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop'}" alt="Quiz Image">
+          <div class="quiz-card-content">
+            <div class="quiz-card-title">${q.title}</div>
+            <p style="font-size: 13px; color: #94a3b8;">Pytanie: ${q.question}</p>
+            <button class="btn-play" onclick="alert('Zaczynamy quiz: ${q.title}!')">Zagraj w Quiz</button>
+          </div>
+        `;
+        quizContainer.appendChild(card);
+      });
+    }
+
+    // Dodawanie Nowego Quizu
+    createQuizForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const title = document.getElementById('quiz-title').value;
+      const question = document.getElementById('quiz-question').value;
+      const img = document.getElementById('quiz-image').value;
+      
+      const optionInputs = document.querySelectorAll('.opt-text');
+      const options = Array.from(optionInputs).map(i => i.value);
+      
+      const correctRadio = document.querySelector('input[name="correct-opt"]:checked').value;
+
+      const newQuiz = {
+        id: Date.now(),
+        title: title,
+        question: question,
+        img: img,
+        options: options,
+        correct: parseInt(correctRadio)
+      };
+
+      quizy.push(newQuiz);
+      renderQuizzes();
+      createQuizForm.reset();
+      alert('Quiz został pomyślnie dodany!');
     });
   </script>
 </body>
