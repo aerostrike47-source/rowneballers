@@ -245,6 +245,7 @@
       width: 100%;
       height: 130px;
       object-fit: cover;
+      background: #000;
     }
 
     .quiz-card-content {
@@ -514,7 +515,6 @@
     const userDisplayName = document.getElementById('user-display-name');
     const navAvatar = document.getElementById('nav-avatar');
     
-    // Profil modal
     const openProfileBtn = document.getElementById('open-profile-btn');
     const profileModalOverlay = document.getElementById('profile-modal-overlay');
     const closeProfileBtn = document.getElementById('close-profile-btn');
@@ -542,7 +542,6 @@
     const addQuestionBtn = document.getElementById('add-question-btn');
     const quizContainer = document.getElementById('quiz-container');
 
-    // Dane użytkownika w localStorage
     let userStats = {
       nick: '',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop',
@@ -550,7 +549,7 @@
       completedQuizzes: 0
     };
 
-    // 8 QUIZÓW - 1 QUIZ Z POPRAWIONĄ DATĄ (OPCJA A: 06.17.2026)
+    // 8 QUIZÓW Z DEDYKOWANYMI GRAFIKAMI I OFICJALNYMI MOTYWAMI
     let quizy = [
       {
         id: 1,
@@ -563,15 +562,99 @@
           { question: "5. Kto wpadał do basenu?", options: ["A. rafi | romun", "B. pomi | romun", "C. juri | rafi", "D. dymek | pomi"], correct: 1 }
         ],
         active: true,
-        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop"
+        img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&auto=format&fit=crop" // TikTok / Social media vibe
       },
-      { id: 2, title: "2. Złota Piłka", questions: [], active: false, img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop" },
-      { id: 3, title: "3. Liga Mistrzów", questions: [], active: false, img: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop" },
-      { id: 4, title: "4. World Cup", questions: [], active: false, img: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop" },
-      { id: 5, title: "5. Piłkarze", questions: [], active: false, img: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop" },
-      { id: 6, title: "6. Marki sportowe", questions: [], active: false, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop" },
-      { id: 7, title: "7. Ligi", questions: [], active: false, img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop" },
-      { id: 8, title: "8. Kluby", questions: [], active: false, img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop" }
+      {
+        id: 2,
+        title: "2. Złota Piłka",
+        questions: [
+          { question: "1. Kto ma najwięcej Złotych Piłek w historii?", options: ["A. Cristiano Ronaldo", "B. Lionel Messi", "C. Pelé", "D. Diego Maradona"], correct: 1 },
+          { question: "2. Przez jaki czas nagroda była łączona z nagrodą Piłkarza Roku FIFA?", options: ["A. 2000-2005", "B. 2010-2015", "C. 2010-2015", "D. Nigdy"], correct: 1 },
+          { question: "3. Który klub ma najwięcej wygranych Złotych Piłek przez swoich graczy?", options: ["A. Real Madryt", "B. AC Milan", "C. Barcelona", "D. Juventus"], correct: 0 },
+          { question: "4. W którym roku po raz przyznano Złotą Piłkę?", options: ["A. 1956", "B. 1970", "C. 1930", "D. 1992"], correct: 0 },
+          { question: "5. Kto jako pierwszy bramkarz wygrał Złotą Piłkę?", options: ["A. Gianluigi Buffon", "B. Manuel Neuer", "C. Lew Jaszyn", "D. Iker Casillas"], correct: 2 }
+        ],
+        active: true,
+        img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop" // Złota piłka / Trofeum
+      },
+      {
+        id: 3,
+        title: "3. Liga Mistrzów",
+        questions: [
+          { question: "1. Który klub zdobył najwięcej tytułów Ligi Mistrzów/PKE?", options: ["A. AC Milan", "B. Bayern Monachium", "C. Real Madryt", "D. Liverpool"], correct: 2 },
+          { question: "2. Kto jest najlepszym strzelcem w historii Ligi Mistrzów?", options: ["A. Robert Lewandowski", "B. Cristiano Ronaldo", "C. Lionel Messi", "D. Karim Benzema"], correct: 1 },
+          { question: "3. Jak pierwotnie nazywała się Liga Mistrzów?", options: ["A. Puchar Mistrzów Krajowych (PKE)", "B. Superliga", "C. Puchar UEFA", "D. Liga Europejska"], correct: 0 },
+          { question: "4. Która drużyna odwróciła wynik z 0:3 do 3:3 w słynnym finale w Stambule (2005)?", options: ["A. AC Milan", "B. Liverpool", "C. Borussia Dortmund", "D. Valencia"], correct: 1 },
+          { question: "5. W jakim kraju odbył się pierwszy finał w historii?", options: ["A. Anglia", "B. Francja", "C. Włochy", "D. Hiszpania"], correct: 1 }
+        ],
+        active: true,
+        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop" // Stadion / Klimat UCL
+      },
+      {
+        id: 4,
+        title: "4. World Cup",
+        questions: [
+          { question: "1. Kto wygrał Mistrzostwa Świata w 2022 roku?", options: ["A. Francja", "B. Brazylia", "C. Argentyna", "D. Niemcy"], correct: 2 },
+          { question: "2. Która reprezentacja ma najwięcej tytułów Mistrza Świata?", options: ["A. Niemcy", "B. Włochy", "C. Argentyna", "D. Brazylia"], correct: 3 },
+          { question: "3. Kto jest najlepszym strzelcem w historii Mistrzostw Świata?", options: ["A. Miroslav Klose", "B. Ronaldo Nazario", "C. Gerd Müller", "D. Lionel Messi"], correct: 0 },
+          { question: "4. W którym roku odbył się pierwszy mundial?", options: ["A. 1928", "B. 1930", "C. 1934", "D. 1950"], correct: 1 },
+          { question: "5. Gdzie odbył się mundial w 2006 roku?", options: ["A. Korea i Japonia", "B. Niemcy", "C. RPA", "D. Brazylia"], correct: 1 }
+        ],
+        active: true,
+        img: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop" // Puchar Świata / Globalny futbol
+      },
+      {
+        id: 5,
+        title: "5. Piłkarze",
+        questions: [
+          { question: "1. Kto nosi pseudonim 'CR7'?", options: ["A. Neymar", "B. Cristiano Ronaldo", "C. Eden Hazard", "D. Kevin De Bruyne"], correct: 1 },
+          { question: "2. Z jakiego kraju pochodzi Erling Haaland?", options: ["A. Szwecja", "B. Dania", "C. Norwegia", "D. Islandia"], correct: 2 },
+          { question: "3. Który piłkarz gra z numerem 10 w reprezentacji Argentyny?", options: ["A. Paulo Dybala", "B. Angel Di Maria", "C. Lautaro Martinez", "D. Lionel Messi"], correct: 3 },
+          { question: "4. W jakim klubie przez większość kariery grał Francesco Totti?", options: ["A. Lazio", "B. Roma", "C. Juventus", "D. Inter"], correct: 1 },
+          { question: "5. Kto zdobył bramkę ręką („Ręka Boga”) na MŚ 1986?", options: ["A. Pelé", "B. Diego Maradona", "C. Zinedine Zidane", "D. Ronaldo"], correct: 1 }
+        ],
+        active: true,
+        img: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop" // Sylwetka piłkarza
+      },
+      {
+        id: 6,
+        title: "6. Marki sportowe",
+        questions: [
+          { question: "1. Jakie logo ma marka Nike?", options: ["A. Swoosh (łyżwa)", "B. Trzy paski", "C. Kot (puma)", "D. Diament"], correct: 0 },
+          { question: "2. Z jakiego kraju pochodzi marka Adidas?", options: ["A. USA", "B. Włochy", "C. Niemcy", "D. Francja"], correct: 2 },
+          { question: "3. Która marka stworzyła słynne buty 'Predator'?", options: ["A. Nike", "B. Puma", "C. Adidas", "D. Umbro"], correct: 2 },
+          { question: "4. Jakim symbolem posługuje się marka Le Coq Sportif?", options: ["A. Kogut", "B. Lew", "C. Orzeł", "D. Wilk"], correct: 0 },
+          { question: "5. Która marka ubrała reprezentację Polski na MŚ 1974?", options: ["A. Adidas", "B. Nike", "C. Puma", "D. Le Coq Sportif"], correct: 2 }
+        ],
+        active: true,
+        img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop" // Buty sportowe / Marki
+      },
+      {
+        id: 7,
+        title: "7. Ligi",
+        questions: [
+          { question: "1. Jak nazywa się pierwsza liga w Anglii?", options: ["A. Championship", "B. Premier League", "C. La Liga", "D. Serie A"], correct: 1 },
+          { question: "2. W jakim kraju gra się w Serie A?", options: ["A. Hiszpania", "B. Włochy", "C. Niemcy", "D. Francja"], correct: 1 },
+          { question: "3. Jak nazywa się niemiecka ekstraklasa?", options: ["A. Bundesliga", "B. Eredivisie", "C. Primeira Liga", "D. Jupiler Pro League"], correct: 0 },
+          { question: "4. Ile zespołów liczy tradycyjnie polska Ekstraklasa?", options: ["A. 16", "B. 18", "C. 20", "D. 14"], correct: 1 },
+          { question: "5. Z jakiego kraju pochodzi liga La Liga?", options: ["A. Portugalia", "B. Hiszpania", "C. Brazylia", "D. Meksyk"], correct: 1 }
+        ],
+        active: true,
+        img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop" // Herb / Piłka ligowa
+      },
+      {
+        id: 8,
+        title: "8. Kluby",
+        questions: [
+          { question: "1. Z jakiego miasta pochodzi Juventus?", options: ["A. Mediolan", "B. Rzym", "C. Turyn", "D. Neapol"], correct: 2 },
+          { question: "2. Jakie barwy ma FC Barcelona?", options: ["A. Biało-czerwone", "B. Niebiesko-bordowe (Blaugrana)", "C. Żółto-czarne", "D. Biało-niebieskie"], correct: 1 },
+          { question: "3. Na jakim stadionie domowe mecze gra Manchester United?", options: ["A. Anfield", "B. Etihad", "C. Old Trafford", "D. Stamford Bridge"], correct: 2 },
+          { question: "4. Jak nazywa się przydomek Borussii Dortmund?", options: ["A. Die Borussen", "B. Die Roten", "C. Los Blancos", "D. The Citizens"], correct: 0 },
+          { question: "5. W którym mieście gra klub Paris Saint-Germain (PSG)?", options: ["A. Marsylia", "B. Lyon", "C. Paryż", "D. Monako"], correct: 2 }
+        ],
+        active: true,
+        img: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop" // Kluby / Herb
+      }
     ];
 
     const savedNick = localStorage.getItem('rowneballer_nick');
@@ -608,7 +691,6 @@
       renderQuizzes();
     }
 
-    // Obsługa Profilu GUI i wczytywania zdjęcia z dysku
     openProfileBtn.addEventListener('click', () => {
       profileNick.textContent = userStats.nick;
       profilePoints.textContent = userStats.points + " pkt";
@@ -717,7 +799,6 @@
       });
     }
 
-    // INTERAKTYWNA GRA W QUIZ (2 PKT ZA PYTANIE, RAZEM 10 PKT)
     let currentQuiz = null;
     let currentQIndex = 0;
     let correctAnswersCount = 0;
