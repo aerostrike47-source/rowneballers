@@ -513,6 +513,22 @@
     .ranking-row:hover {
       background: #f1f5f9;
     }
+
+    .quiz-img-container {
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .quiz-img-container img {
+      max-height: 140px;
+      max-width: 100%;
+      border-radius: 8px;
+      object-fit: contain;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 5px;
+      background: #fff;
+    }
   </style>
 </head>
 <body>
@@ -565,7 +581,6 @@
       </div>
       <div class="nav-right">
         <button class="btn-create-modal" id="open-modal-btn">+ Stwórz quiz</button>
-        <!-- KLIKALNY PROFIL W PRAWYM GÓRNYM ROGU -->
         <div class="user-profile-badge" id="open-profile-btn">
           <img id="nav-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop" alt="Avatar">
           <span class="user-info-text">Cześć, <strong id="user-display-name">Gracz</strong>!</span>
@@ -632,9 +647,7 @@
               <th>Punkty</th>
             </tr>
           </thead>
-          <tbody id="ranking-tbody">
-            <!-- Wypełniane dynamicznie -->
-          </tbody>
+          <tbody id="ranking-tbody"></tbody>
         </table>
       </div>
     </div>
@@ -891,7 +904,7 @@
       viewProfileModalOverlay.style.display = 'flex';
     }
 
-    // 8 QUIZÓW Z ZDJĘCIAMI LOGOTYPÓW, ZAWODNIKÓW I HERBÓW BEZPOŚREDNIO W PYTANIACH
+    // 8 QUIZÓW Z BEZPIECZNYMI OBRAZKAMI I STABILNYMI GRAFIKAMI W PYTANIACH
     let quizy = [
       {
         id: 1,
@@ -910,11 +923,11 @@
         id: 2,
         title: "2. Złota Piłka",
         questions: [
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Ballon_d%27Or_logo.svg/640px-Ballon_d%27Or_logo.svg.png", question: "Kto ma najwięcej Złotych Piłek w historii?", options: ["A. Cristiano Ronaldo", "B. Lionel Messi", "C. Pelé", "D. Diego Maradona"], correct: 1 },
-          { image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", question: "Przez jaki czas nagroda była łączona z nagrodą Piłkarza Roku FIFA?", options: ["A. 2000-2005", "B. 2010-2015", "C. 2016-2020", "D. Nigdy"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/1200px-Real_Madrid_CF.svg.png", question: "Który klub ma najwięcej wygranych Złotych Piłek przez swoich graczy?", options: ["A. Real Madryt", "B. AC Milan", "C. Barcelona", "D. Juventus"], correct: 0 },
-          { image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", question: "W którym roku po raz przyznano Złotą Piłkę?", options: ["A. 1956", "B. 1970", "C. 1930", "D. 1992"], correct: 0 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Lev_Yashin_1963.jpg/640px-Lev_Yashin_1963.jpg", question: "Kto jako pierwszy bramkarz wygrał Złotą Piłkę?", options: ["A. Gianluigi Buffon", "B. Manuel Neuer", "C. Lew Jaszyn", "D. Iker Casillas"], correct: 2 }
+          { image: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop", question: "Kto ma najwięcej Złotych Piłek w historii?", options: ["A. Cristiano Ronaldo", "B. Lionel Messi", "C. Pelé", "D. Diego Maradona"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", question: "Przez jaki czas nagroda była łączona z nagrodą Piłkarza Roku FIFA?", options: ["A. 2000-2005", "B. 2010-2015", "C. 2016-2020", "D. Nigdy"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop", question: "Który klub ma najwięcej wygranych Złotych Piłek przez swoich graczy?", options: ["A. Real Madryt", "B. AC Milan", "C. Barcelona", "D. Juventus"], correct: 0 },
+          { image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop", question: "W którym roku po raz przyznano Złotą Piłkę?", options: ["A. 1956", "B. 1970", "C. 1930", "D. 1992"], correct: 0 },
+          { image: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop", question: "Kto jako pierwszy bramkarz wygrał Złotą Piłkę?", options: ["A. Gianluigi Buffon", "B. Manuel Neuer", "C. Lew Jaszyn", "D. Iker Casillas"], correct: 2 }
         ],
         active: true,
         img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop"
@@ -923,11 +936,11 @@
         id: 3,
         title: "3. Liga Mistrzów",
         questions: [
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f5/UEFA_Champions_League_logo_2.svg/1200px-UEFA_Champions_League_logo_2.svg.png", question: "Który klub zdobył najwięcej tytułów Ligi Mistrzów/PKE?", options: ["A. AC Milan", "B. Bayern Monachium", "C. Real Madryt", "D. Liverpool"], correct: 2 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Cristiano_Ronaldo_playing_for_Al_Nassr_in_2023_%28cropped%29.jpg/640px-Cristiano_Ronaldo_playing_for_Al_Nassr_in_2023_%28cropped%29.jpg", question: "Kto jest najlepszym strzelcem w historii Ligi Mistrzów?", options: ["A. Robert Lewandowski", "B. Cristiano Ronaldo", "C. Lionel Messi", "D. Karim Benzema"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", question: "Który klub zdobył najwięcej tytułów Ligi Mistrzów/PKE?", options: ["A. AC Milan", "B. Bayern Monachium", "C. Real Madryt", "D. Liverpool"], correct: 2 },
+          { image: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop", question: "Kto jest najlepszym strzelcem w historii Ligi Mistrzów?", options: ["A. Robert Lewandowski", "B. Cristiano Ronaldo", "C. Lionel Messi", "D. Karim Benzema"], correct: 1 },
           { image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop", question: "Jak pierwotnie nazywała się Liga Mistrzów?", options: ["A. Puchar Mistrzów Krajowych (PKE)", "B. Superliga", "C. Puchar UEFA", "D. Liga Europejska"], correct: 0 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Liverpool_FC.svg/1200px-Liverpool_FC.svg.png", question: "Która drużyna odwróciła wynik z 0:3 do 3:3 w słynnym finale w Stambule (2005)?", options: ["A. AC Milan", "B. Liverpool", "C. Borussia Dortmund", "D. Valencia"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/Stade_de_France_logo.svg/1200px-Stade_de_France_logo.svg.png", question: "W jakim kraju odbył się pierwszy finał w historii (1956)?", options: ["A. Anglia", "B. Francja", "C. Włochy", "D. Hiszpania"], correct: 1 }
+          { image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop", question: "Która drużyna odwróciła wynik z 0:3 do 3:3 w słynnym finale w Stambule (2005)?", options: ["A. AC Milan", "B. Liverpool", "C. Borussia Dortmund", "D. Valencia"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", question: "W jakim kraju odbył się pierwszy finał w historii (1956)?", options: ["A. Anglia", "B. Francja", "C. Włochy", "D. Hiszpania"], correct: 1 }
         ],
         active: true,
         img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop"
@@ -936,11 +949,11 @@
         id: 4,
         title: "4. World Cup",
         questions: [
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/2022_FIFA_World_Cup.svg/1200px-2022_FIFA_World_Cup.svg.png", question: "Kto wygrał Mistrzostwa Świata w 2022 roku?", options: ["A. Francja", "B. Brazylia", "C. Argentyna", "D. Niemcy"], correct: 2 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/Brazilian_Football_Confederation_logo.svg/1200px-Brazilian_Football_Confederation_logo.svg.png", question: "Która reprezentacja ma najwięcej tytułów Mistrza Świata?", options: ["A. Niemcy", "B. Włochy", "C. Argentyna", "D. Brazylia"], correct: 3 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Miroslav_Klose_2014.jpg/640px-Miroslav_Klose_2014.jpg", question: "Kto jest najlepszym strzelcem w historii Mistrzostw Świata?", options: ["A. Miroslav Klose", "B. Ronaldo Nazario", "C. Gerd Müller", "D. Lionel Messi"], correct: 0 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Uruguay_FA_logo.svg/1024px-Uruguay_FA_logo.svg.png", question: "W którym roku odbył się pierwszy mundial?", options: ["A. 1928", "B. 1930", "C. 1934", "D. 1950"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/2006_FIFA_World_Cup.svg/1200px-2006_FIFA_World_Cup.svg.png", question: "Gdzie odbył się mundial w 2006 roku?", options: ["A. Korea i Japonia", "B. Niemcy", "C. RPA", "D. Brazylia"], correct: 1 }
+          { image: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop", question: "Kto wygrał Mistrzostwa Świata w 2022 roku?", options: ["A. Francja", "B. Brazylia", "C. Argentyna", "D. Niemcy"], correct: 2 },
+          { image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", question: "Która reprezentacja ma najwięcej tytułów Mistrza Świata?", options: ["A. Niemcy", "B. Włochy", "C. Argentyna", "D. Brazylia"], correct: 3 },
+          { image: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop", question: "Kto jest najlepszym strzelcem w historii Mistrzostw Świata?", options: ["A. Miroslav Klose", "B. Ronaldo Nazario", "C. Gerd Müller", "D. Lionel Messi"], correct: 0 },
+          { image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop", question: "W którym roku odbył się pierwszy mundial?", options: ["A. 1928", "B. 1930", "C. 1934", "D. 1950"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop", question: "Gdzie odbył się mundial w 2006 roku?", options: ["A. Korea i Japonia", "B. Niemcy", "C. RPA", "D. Brazylia"], correct: 1 }
         ],
         active: true,
         img: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop"
@@ -949,11 +962,11 @@
         id: 5,
         title: "5. Piłkarze",
         questions: [
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Cristiano_Ronaldo_2018.jpg/640px-Cristiano_Ronaldo_2018.jpg", question: "Kto nosi słynny pseudonim 'CR7'?", options: ["A. Neymar", "B. Cristiano Ronaldo", "C. Eden Hazard", "D. Kevin De Bruyne"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Erling_Haaland_2023_%28cropped%29.jpg/640px-Erling_Haaland_2023_%28cropped%29.jpg", question: "Z jakiego kraju pochodzi Erling Haaland?", options: ["A. Szwecja", "B. Dania", "C. Norwegia", "D. Islandia"], correct: 2 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg/640px-Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg", question: "Który piłkarz gra z numerem 10 w reprezentacji Argentyny?", options: ["A. Paulo Dybala", "B. Angel Di Maria", "C. Lautaro Martinez", "D. Lionel Messi"], correct: 3 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Francesco_Totti_2015.jpg/640px-Francesco_Totti_2015.jpg", question: "W jakim klubie przez całą karierę klubową grał Francesco Totti?", options: ["A. Lazio", "B. Roma", "C. Juventus", "D. Inter"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Maradona_1986.jpg/640px-Maradona_1986.jpg", question: "Kto zdobył słynną bramkę ręką („Ręka Boga”) na MŚ 1986?", options: ["A. Pelé", "B. Diego Maradona", "C. Zinedine Zidane", "D. Ronaldo"], correct: 1 }
+          { image: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop", question: "Kto nosi słynny pseudonim 'CR7'?", options: ["A. Neymar", "B. Cristiano Ronaldo", "C. Eden Hazard", "D. Kevin De Bruyne"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", question: "Z jakiego kraju pochodzi Erling Haaland?", options: ["A. Szwecja", "B. Dania", "C. Norwegia", "D. Islandia"], correct: 2 },
+          { image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop", question: "Który piłkarz gra z numerem 10 w reprezentacji Argentyny?", options: ["A. Paulo Dybala", "B. Angel Di Maria", "C. Lautaro Martinez", "D. Lionel Messi"], correct: 3 },
+          { image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop", question: "W jakim klubie przez całą karierę klubową grał Francesco Totti?", options: ["A. Lazio", "B. Roma", "C. Juventus", "D. Inter"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop", question: "Kto zdobył słynną bramkę ręką („Ręka Boga”) na MŚ 1986?", options: ["A. Pelé", "B. Diego Maradona", "C. Zinedine Zidane", "D. Ronaldo"], correct: 1 }
         ],
         active: true,
         img: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop"
@@ -962,11 +975,11 @@
         id: 6,
         title: "6. Marki sportowe",
         questions: [
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/1200px-Logo_NIKE.svg.png", question: "Jakie to kultowe logo marki sportowej?", options: ["A. Nike (Swoosh)", "B. Adidas", "C. Puma", "D. Under Armour"], correct: 0 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Adidas_Logo.svg/1200px-Adidas_Logo.svg.png", question: "Jakiej marki jest to logo z trzema paskami?", options: ["A. Nike", "B. Puma", "C. Adidas", "D. Reebok"], correct: 2 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/b/b2/Puma_AG.svg/1200px-Puma_AG.svg.png", question: "Jakiej marki jest to logo przedstawiające skaczącego kota?", options: ["A. Nike", "B. Puma", "C. Kappa", "D. Umbro"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Le_Coq_Sportif_logo.svg/1200px-Le_Coq_Sportif_logo.svg.png", question: "Jakim symbolem posługuje się ta marka sportowa?", options: ["A. Kogut", "B. Lew", "C. Orzeł", "D. Wilk"], correct: 0 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/e/e6/New_Balance_logo.svg/1200px-New_Balance_logo.svg.png", question: "Jakiej marki jest to logo z literą 'N'?", options: ["A. Nike", "B. New Balance", "C. Mizuno", "D. Diadora"], correct: 1 }
+          { image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop", question: "Jakie to kultowe logo (Swoosh) / marka sportowa?", options: ["A. Nike", "B. Adidas", "C. Puma", "D. Under Armour"], correct: 0 },
+          { image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop", question: "Jakiej marki jest słynny motyw trzech pasków?", options: ["A. Nike", "B. Puma", "C. Adidas", "D. Reebok"], correct: 2 },
+          { image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", question: "Jakiej marki jest logo przedstawiające skaczącego drapieżnego kota?", options: ["A. Nike", "B. Puma", "C. Kappa", "D. Umbro"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop", question: "Jakim symbolem posługuje się marka Le Coq Sportif?", options: ["A. Kogut", "B. Lew", "C. Orzeł", "D. Wilk"], correct: 0 },
+          { image: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop", question: "Jakiej znanej marki jest logo z charakterystyczną literą 'N'?", options: ["A. Nike", "B. New Balance", "C. Mizuno", "D. Diadora"], correct: 1 }
         ],
         active: true,
         img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop"
@@ -975,11 +988,11 @@
         id: 7,
         title: "7. Ligi",
         questions: [
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Premier_League_Logo.svg/1200px-Premier_League_Logo.svg.png", question: "Jak nazywa się ta angielska liga piłkarska?", options: ["A. Championship", "B. Premier League", "C. La Liga", "D. Serie A"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Logo_Serie_A_%282019%29.svg/1200px-Logo_Serie_A_%282019%29.svg.png", question: "W jakim kraju gra się w lidze z tym logo?", options: ["A. Hiszpania", "B. Włochy", "C. Niemcy", "D. Francja"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/d/df/Bundesliga_logo_%282017%29.svg/1200px-Bundesliga_logo_%282017%29.svg.png", question: "Jak nazywa się niemiecka ekstraklasa?", options: ["A. Bundesliga", "B. Eredivisie", "C. Primeira Liga", "D. Jupiler Pro League"], correct: 0 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Ekstraklasa_logo.svg/1200px-Ekstraklasa_logo.svg.png", question: "Ile zespołów gra w najwyższej klasie rozgrywkowej w Polsce?", options: ["A. 16", "B. 18", "C. 20", "D. 14"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/LaLiga_logo_2023.svg/1200px-LaLiga_logo_2023.svg.png", question: "Z jakiego kraju pochodzi liga oznaczona tym symbolem?", options: ["A. Portugalia", "B. Hiszpania", "C. Brazylia", "D. Meksyk"], correct: 1 }
+          { image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop", question: "Jak nazywa się najwyższa klasa rozgrywkowa w Anglii z lwem w logo?", options: ["A. Championship", "B. Premier League", "C. La Liga", "D. Serie A"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", question: "W jakim kraju gra się w znanej lidze Serie A?", options: ["A. Hiszpania", "B. Włochy", "C. Niemcy", "D. Francja"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop", question: "Jak nazywa się niemiecka ekstraklasa z charakterystyczną sylwetką zawodnika w biegu?", options: ["A. Bundesliga", "B. Eredivisie", "C. Primeira Liga", "D. Jupiler Pro League"], correct: 0 },
+          { image: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop", question: "Ile zespołów gra w najwyższej klasie rozgrywkowej w Polsce (Ekstraklasa)?", options: ["A. 16", "B. 18", "C. 20", "D. 14"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop", question: "Z jakiego kraju pochodzi liga La Liga?", options: ["A. Portugalia", "B. Hiszpania", "C. Brazylia", "D. Meksyk"], correct: 1 }
         ],
         active: true,
         img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop"
@@ -988,11 +1001,11 @@
         id: 8,
         title: "8. Kluby",
         questions: [
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Juventus_FC_2017_icon_%28black%29.svg/1200px-Juventus_FC_2017_icon_%28black%29.svg.png", question: "Z jakiego miasta pochodzi ten włoski klub?", options: ["A. Mediolan", "B. Rzym", "C. Turyn", "D. Neapol"], correct: 2 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/1200px-FC_Barcelona_%28crest%29.svg.png", question: "Jakie barwy nosi ten zasłużony klub?", options: ["A. Biało-czerwone", "B. Niebiesko-bordowe (Blaugrana)", "C. Żółto-czarne", "D. Biało-niebieskie"], correct: 1 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/Manchester_United_FC_crest.svg/1200px-Manchester_United_FC_crest.svg.png", question: "Na jakim legendarnym stadionie domowe mecze gra Manchester United?", options: ["A. Anfield", "B. Etihad", "C. Old Trafford", "D. Stamford Bridge"], correct: 2 },
-          { image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Borussia_Dortmund_logo.svg/1200px-Borussia_Dortmund_logo.svg.png", question: "Jak brzmi jeden z przydomków Borussii Dortmund?", options: ["A. Die Borussen", "B. Die Roten", "C. Los Blancos", "D. The Citizens"], correct: 0 },
-          { image: "https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Paris_Saint-Germain_F.C..svg/1200px-Paris_Saint-Germain_F.C..svg.png", question: "W jakim europejskim mieście ma swoją siedzibę ten klub?", options: ["A. Marsylia", "B. Lyon", "C. Paryż", "D. Monako"], correct: 2 }
+          { image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop", question: "Z jakiego miasta pochodzi utytułowany klub Juventus (z literą J w herbie)?", options: ["A. Mediolan", "B. Rzym", "C. Turyn", "D. Neapol"], correct: 2 },
+          { image: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop", question: "Jakie barwy nosi FC Barcelona?", options: ["A. Biało-czerwone", "B. Niebiesko-bordowe (Blaugrana)", "C. Żółto-czarne", "D. Biało-niebieskie"], correct: 1 },
+          { image: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop", question: "Na jakim legendarnym stadionie domowe mecze gra Manchester United?", options: ["A. Anfield", "B. Etihad", "C. Old Trafford", "D. Stamford Bridge"], correct: 2 },
+          { image: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop", question: "Jak brzmi jeden z przydomków Borussii Dortmund?", options: ["A. Die Borussen", "B. Die Roten", "C. Los Blancos", "D. The Citizens"], correct: 0 },
+          { image: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop", question: "W jakim europejskim mieście ma swoją siedzibę klub PSG?", options: ["A. Marsylia", "B. Lyon", "C. Paryż", "D. Monako"], correct: 2 }
         ],
         active: true,
         img: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop"
@@ -1162,9 +1175,7 @@
 
     function showQuestion() {
       const q = currentQuiz.questions[currentQIndex];
-      
-      // Obsługa wyświetlania obrazka pytania (jeśli istnieje, np. logo/herb/zdjęcie piłkarza)
-      let imageHtml = q.image ? `<div style="margin-bottom: 15px;"><img src="${q.image}" alt="Pytanie obrazkowe" style="max-height: 120px; object-fit: contain;"></div>` : '';
+      let imageHtml = q.image ? `<div class="quiz-img-container"><img src="${q.image}" alt="Pytanie obrazkowe"></div>` : '';
 
       quizGameBody.innerHTML = `
         <h3 style="color:#dc2626; margin-bottom:15px;">${currentQuiz.title} (${currentQIndex + 1}/${currentQuiz.questions.length})</h3>
