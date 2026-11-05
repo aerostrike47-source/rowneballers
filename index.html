@@ -148,7 +148,7 @@
     .nav-left {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 12px;
     }
 
     .logo {
@@ -157,9 +157,10 @@
       color: #dc2626;
       text-transform: uppercase;
       letter-spacing: 1px;
+      margin-right: 8px;
     }
 
-    .btn-ranking {
+    .btn-nav-action {
       background: #f1f5f9;
       color: #b91c1c;
       border: 1px solid #fecaca;
@@ -171,7 +172,7 @@
       transition: background 0.2s;
     }
 
-    .btn-ranking:hover {
+    .btn-nav-action:hover {
       background: #fee2e2;
     }
 
@@ -369,7 +370,7 @@
     }
 
     /* MODALE */
-    #modal-overlay, #quiz-modal-overlay, #profile-modal-overlay, #ranking-modal-overlay, #view-profile-modal-overlay {
+    #modal-overlay, #quiz-modal-overlay, #profile-modal-overlay, #ranking-modal-overlay, #view-profile-modal-overlay, #info-modal-overlay {
       display: none;
       position: fixed;
       top: 0;
@@ -529,6 +530,29 @@
       padding: 8px;
       background: #fff;
     }
+
+    /* STYL PODPUNKTÓW W INFO-KONKURS */
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .info-list li {
+      background: #f8fafc;
+      border-left: 4px solid #dc2626;
+      padding: 12px 15px;
+      margin-bottom: 12px;
+      border-radius: 0 8px 8px 0;
+      font-size: 15px;
+      color: #334155;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    .info-list li strong {
+      color: #991b1b;
+    }
   </style>
 </head>
 <body>
@@ -577,7 +601,8 @@
     <nav>
       <div class="nav-left">
         <div class="logo">RówneBaller</div>
-        <button class="btn-ranking" id="open-ranking-btn">🏆 Tabela TOP 100</button>
+        <button class="btn-nav-action" id="open-ranking-btn">🏆 Tabela TOP 100</button>
+        <button class="btn-nav-action" id="open-info-btn">ℹ️ Info-Konkurs</button>
       </div>
       <div class="nav-right">
         <button class="btn-create-modal" id="open-modal-btn">+ Stwórz quiz</button>
@@ -605,6 +630,25 @@
         </div>
         <div class="quiz-list" id="quiz-container"></div>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL INFO-KONKURS -->
+  <div id="info-modal-overlay">
+    <div class="modal-content" style="max-width: 500px; text-align: center;">
+      <button class="btn-close-modal" id="close-info-btn">&times;</button>
+      <h2 style="color: #dc2626; margin-bottom: 10px;">⚽ Wielki Konkurs RówneBaller!</h2>
+      <p style="color: #64748b; font-size: 14px;">Rozwiązuj quizy, zbieraj punkty i zgarnij oficjalną nagrodę!</p>
+      
+      <ul class="info-list">
+        <li>🎁 <strong>Nagroda Główna:</strong> Oficjalna piłka m-ki <strong>TRIONDA</strong>!</li>
+        <li>📅 <strong>Finał & Wyniki:</strong> Zwycięzcę ogłosimy już <strong>5 grudnia</strong>!</li>
+        <li>🏆 <strong>Zasady wygranej:</strong> Nagroda trafia do osoby, która zdobędzie <strong>największą liczbę punktów</strong> w rankingu.</li>
+        <li>⏱️ <strong>Strategia:</strong> Rozwiązuj quizy regularnie – co 5 minut odnawia się cooldown i możesz zagrać ponownie!</li>
+        <li>👥 <strong>Profil:</strong> Sprawdzaj swoje miejsce w tabeli w zakładce <strong>TOP 100</strong> oraz w swoim profilu.</li>
+      </ul>
+
+      <button class="btn" id="close-info-btn-2" style="background: #dc2626;">Powrót do gry ⚽</button>
     </div>
   </div>
 
@@ -724,6 +768,11 @@
     const rankingModalOverlay = document.getElementById('ranking-modal-overlay');
     const closeRankingBtn = document.getElementById('close-ranking-btn');
     const rankingTbody = document.getElementById('ranking-tbody');
+
+    const openInfoBtn = document.getElementById('open-info-btn');
+    const infoModalOverlay = document.getElementById('info-modal-overlay');
+    const closeInfoBtn = document.getElementById('close-info-btn');
+    const closeInfoBtn2 = document.getElementById('close-info-btn-2');
 
     const viewProfileModalOverlay = document.getElementById('view-profile-modal-overlay');
     const closeViewProfileBtn = document.getElementById('close-view-profile-btn');
@@ -893,6 +942,12 @@
     });
 
     closeRankingBtn.addEventListener('click', () => rankingModalOverlay.style.display = 'none');
+    
+    // OBSŁUGA OKNA INFO-KONKURS
+    openInfoBtn.addEventListener('click', () => infoModalOverlay.style.display = 'flex');
+    closeInfoBtn.addEventListener('click', () => infoModalOverlay.style.display = 'none');
+    closeInfoBtn2.addEventListener('click', () => infoModalOverlay.style.display = 'none');
+
     closeViewProfileBtn.addEventListener('click', () => viewProfileModalOverlay.style.display = 'none');
 
     function showUserProfile(userObj, rankNum) {
@@ -904,7 +959,7 @@
       viewProfileModalOverlay.style.display = 'flex';
     }
 
-    // 8 QUIZÓW Z BEZPIECZNYMI LINKAMI GRAFICZNYMI (DZIAŁAJĄCYMI NA 100%)
+    // 8 QUIZÓW Z BEZPIECZNYMI LINKAMI GRAFICZNYMI
     let quizy = [
       {
         id: 1,
