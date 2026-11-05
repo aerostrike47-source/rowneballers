@@ -145,12 +145,34 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
     .logo {
       font-size: 22px;
       font-weight: 800;
       color: #dc2626;
       text-transform: uppercase;
       letter-spacing: 1px;
+    }
+
+    .btn-ranking {
+      background: #f1f5f9;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .btn-ranking:hover {
+      background: #fee2e2;
     }
 
     .nav-right {
@@ -347,7 +369,7 @@
     }
 
     /* MODALE */
-    #modal-overlay, #quiz-modal-overlay, #profile-modal-overlay {
+    #modal-overlay, #quiz-modal-overlay, #profile-modal-overlay, #ranking-modal-overlay, #view-profile-modal-overlay {
       display: none;
       position: fixed;
       top: 0;
@@ -463,11 +485,39 @@
       border-bottom: 1px solid #e2e8f0;
       font-size: 15px;
     }
+
+    /* TABELA RANKINGU */
+    .ranking-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .ranking-table th, .ranking-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+
+    .ranking-table th {
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    .ranking-row {
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .ranking-row:hover {
+      background: #f1f5f9;
+    }
   </style>
 </head>
 <body>
 
-  <!-- OKNO LOGOWANIA / REJESTRACJI Z 4-CYFROWYM KODEM -->
+  <!-- OKNO LOGOWANIA / REJESTRACJI -->
   <div id="auth-overlay" class="auth-overlay" style="display: none;">
     <div class="auth-container">
       <h2 id="auth-title">Zaloguj się</h2>
@@ -509,7 +559,10 @@
   <!-- CONTAINER KONTENTU -->
   <div id="app-content" style="display: none; flex-direction: column; min-height: 100vh; background: #f8fafc;">
     <nav>
-      <div class="logo">RówneBaller</div>
+      <div class="nav-left">
+        <div class="logo">RówneBaller</div>
+        <button class="btn-ranking" id="open-ranking-btn">🏆 Tabela TOP 100</button>
+      </div>
       <div class="nav-right">
         <button class="btn-create-modal" id="open-modal-btn">+ Stwórz quiz</button>
         <!-- KLIKALNY PROFIL W PRAWYM GÓRNYM ROGU -->
@@ -563,6 +616,47 @@
     </div>
   </div>
 
+  <!-- MODAL TABELI TOP 100 -->
+  <div id="ranking-modal-overlay">
+    <div class="modal-content" style="max-width: 550px;">
+      <button class="btn-close-modal" id="close-ranking-btn">&times;</button>
+      <h2 style="color: #dc2626; margin-bottom: 15px; text-align: center;">🏆 Tabela TOP 100</h2>
+      <p style="font-size: 13px; color: #64748b; text-align: center; margin-bottom: 15px;">Kliknij w gracza, aby podejrzeć jego profil.</p>
+      
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table class="ranking-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nick</th>
+              <th>Punkty</th>
+            </tr>
+          </thead>
+          <tbody id="ranking-tbody">
+            <!-- Wypełniane dynamicznie -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL PODGLĄDU PROFILU INNEGO GRACZA -->
+  <div id="view-profile-modal-overlay">
+    <div class="modal-content" style="max-width: 450px; text-align: center;">
+      <button class="btn-close-modal" id="close-view-profile-btn">&times;</button>
+      <h2 style="color: #dc2626; margin-bottom: 15px;">Profil Gracza</h2>
+      
+      <img id="view-avatar" src="" alt="Avatar" style="width: 90px; height: 90px; border-radius: 50%; object-fit: cover; margin-bottom: 15px; border: 3px solid #dc2626;">
+      
+      <div style="text-align: left; margin-bottom: 20px;">
+        <div class="profile-info-row"><span>Nazwa użytkownika:</span> <strong id="view-nick">Gracz</strong></div>
+        <div class="profile-info-row"><span>Zdobyte Punkty:</span> <strong id="view-points" style="color: #dc2626;">0 pkt</strong></div>
+        <div class="profile-info-row"><span>Miejsce w tabeli:</span> <strong id="view-rank">#1</strong></div>
+        <div class="profile-info-row"><span>Ukończone quizy:</span> <strong id="view-completed">0</strong></div>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL TWORZENIA QUIZU -->
   <div id="modal-overlay">
     <div class="modal-content">
@@ -613,6 +707,21 @@
     const profileAvatarPreview = document.getElementById('profile-avatar-preview');
     const avatarFileInput = document.getElementById('avatar-file-input');
 
+    // Ranking modal elements
+    const openRankingBtn = document.getElementById('open-ranking-btn');
+    const rankingModalOverlay = document.getElementById('ranking-modal-overlay');
+    const closeRankingBtn = document.getElementById('close-ranking-btn');
+    const rankingTbody = document.getElementById('ranking-tbody');
+
+    // View profile modal elements
+    const viewProfileModalOverlay = document.getElementById('view-profile-modal-overlay');
+    const closeViewProfileBtn = document.getElementById('close-view-profile-btn');
+    const viewAvatar = document.getElementById('view-avatar');
+    const viewNick = document.getElementById('view-nick');
+    const viewPoints = document.getElementById('view-points');
+    const viewRank = document.getElementById('view-rank');
+    const viewCompleted = document.getElementById('view-completed');
+
     const goToDashboardBtn = document.getElementById('go-to-dashboard-btn');
     const backToHomeBtn = document.getElementById('back-to-home-btn');
     
@@ -636,7 +745,7 @@
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop',
       points: 0,
       completedQuizzes: 0,
-      cooldowns: {} // Przechowuje znaczniki czasu dla każdego quizu
+      cooldowns: {}
     };
 
     window.addEventListener('DOMContentLoaded', () => {
@@ -646,7 +755,6 @@
       } else {
         authOverlay.style.display = 'flex';
       }
-      // Odświeżanie zegarów co sekundę
       setInterval(updateCooldownsUI, 1000);
     });
 
@@ -745,6 +853,47 @@
     function logout() {
       localStorage.removeItem('rowneballer_active_user');
       location.reload();
+    }
+
+    // Otwieranie i obsługa rankingu TOP 100
+    openRankingBtn.addEventListener('click', () => {
+      let usersObj = JSON.parse(localStorage.getItem('rowneballer_users') || '{}');
+      let usersArr = Object.values(usersObj);
+      
+      // Sortowanie od największej liczby punktów
+      usersArr.sort((a, b) => b.points - a.points);
+
+      rankingTbody.innerHTML = '';
+      if (usersArr.length === 0) {
+        rankingTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#64748b;">Brak graczy w tabeli</td></tr>`;
+      } else {
+        usersArr.forEach((u, index) => {
+          const row = document.createElement('tr');
+          row.className = 'ranking-row';
+          row.innerHTML = `
+            <td>#${index + 1}</td>
+            <td><strong>${u.nick}</strong></td>
+            <td><strong style="color: #dc2626;">${u.points} pkt</strong></td>
+          `;
+          row.addEventListener('click', () => {
+            showUserProfile(u, index + 1);
+          });
+          rankingTbody.appendChild(row);
+        });
+      }
+      rankingModalOverlay.style.display = 'flex';
+    });
+
+    closeRankingBtn.addEventListener('click', () => rankingModalOverlay.style.display = 'none');
+    closeViewProfileBtn.addEventListener('click', () => viewProfileModalOverlay.style.display = 'none');
+
+    function showUserProfile(userObj, rankNum) {
+      viewAvatar.src = userObj.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop';
+      viewNick.textContent = userObj.nick;
+      viewPoints.textContent = (userObj.points || 0) + ' pkt';
+      viewRank.textContent = '#' + rankNum;
+      viewCompleted.textContent = userObj.completedQuizzes || 0;
+      viewProfileModalOverlay.style.display = 'flex';
     }
 
     // 8 QUIZÓW
@@ -858,7 +1007,14 @@
     openProfileBtn.addEventListener('click', () => {
       profileNick.textContent = userStats.nick;
       profilePoints.textContent = userStats.points + " pkt";
-      profileRank.textContent = "#1";
+      
+      // Obliczanie aktualnego miejsca użytkownika w rankingu
+      let usersObj = JSON.parse(localStorage.getItem('rowneballer_users') || '{}');
+      let usersArr = Object.values(usersObj);
+      usersArr.sort((a, b) => b.points - a.points);
+      let myRankIndex = usersArr.findIndex(u => u.nick === userStats.nick);
+      profileRank.textContent = myRankIndex !== -1 ? `#${myRankIndex + 1}` : '#1';
+
       profileCompleted.textContent = userStats.completedQuizzes;
       profileAvatarPreview.src = userStats.avatar;
       profileModalOverlay.style.display = 'flex';
@@ -1033,7 +1189,6 @@
         userStats.points += earnedPoints;
         userStats.completedQuizzes++;
         
-        // Ustawienie 5 minut cooldownu (5 * 60 * 1000 ms)
         userStats.cooldowns[currentQuiz.id] = Date.now() + (5 * 60 * 1000);
         
         saveUserData();
