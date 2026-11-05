@@ -20,7 +20,7 @@
       flex-direction: column;
     }
 
-    /* SYSTEM LOGOWANIA / REJESTRACJI (AKOD) */
+    /* SYSTEM LOGOWANIA / REJESTRACJI */
     .auth-overlay {
       position: fixed;
       top: 0;
@@ -333,6 +333,19 @@
       background: #b91c1c;
     }
 
+    .btn-play:disabled {
+      background: #cbd5e1;
+      cursor: not-allowed;
+    }
+
+    .cooldown-text {
+      font-size: 12px;
+      color: #dc2626;
+      font-weight: bold;
+      margin-top: 10px;
+      text-align: center;
+    }
+
     /* MODALE */
     #modal-overlay, #quiz-modal-overlay, #profile-modal-overlay {
       display: none;
@@ -617,16 +630,15 @@
     const quizContainer = document.getElementById('quiz-container');
     const authError = document.getElementById('auth-error');
 
-    let currentUser = null;
     let userStats = {
       nick: '',
       code: '',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop',
       points: 0,
-      completedQuizzes: 0
+      completedQuizzes: 0,
+      cooldowns: {} // Przechowuje znaczniki czasu dla każdego quizu
     };
 
-    // SPRAWDZENIE SESJI PRZY STARCIE
     window.addEventListener('DOMContentLoaded', () => {
       const activeUserNick = localStorage.getItem('rowneballer_active_user');
       if (activeUserNick) {
@@ -634,6 +646,8 @@
       } else {
         authOverlay.style.display = 'flex';
       }
+      // Odświeżanie zegarów co sekundę
+      setInterval(updateCooldownsUI, 1000);
     });
 
     function switchTab(tab) {
@@ -670,13 +684,13 @@
         return;
       }
 
-      // Tworzenie nowego konta
       const newUser = {
         nick: nick,
         code: code,
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop',
         points: 0,
-        completedQuizzes: 0
+        completedQuizzes: 0,
+        cooldowns: {}
       };
 
       users[nick] = newUser;
@@ -712,6 +726,7 @@
       let users = JSON.parse(localStorage.getItem('rowneballer_users') || '{}');
       if (users[nick]) {
         userStats = users[nick];
+        if (!userStats.cooldowns) userStats.cooldowns = {};
         userDisplayName.textContent = userStats.nick;
         navAvatar.src = userStats.avatar;
         appContent.style.display = 'flex';
@@ -917,17 +932,25 @@
 
     function renderQuizzes() {
       quizContainer.innerHTML = '';
+      const now = Date.now();
+
       quizy.forEach(q => {
         const card = document.createElement('div');
         card.className = 'quiz-card';
         
+        let cooldownEnd = userStats.cooldowns[q.id] || 0;
+        let inCooldown = now < cooldownEnd;
+
         if (q.active) {
           card.innerHTML = `
             <img src="${q.img}" alt="Quiz Image">
             <div class="quiz-card-content">
               <div class="quiz-card-title">${q.title}</div>
               <p style="font-size: 13px; color: #64748b; margin-bottom: 10px;">Pytań: ${q.questions.length} (Max 10 pkt)</p>
-              <button class="btn-play" onclick="startQuiz(${q.id})">Zagraj</button>
+              <button class="btn-play" id="btn-quiz-${q.id}" ${inCooldown ? 'disabled' : ''} onclick="startQuiz(${q.id})">
+                ${inCooldown ? 'Zablokowany' : 'Zagraj'}
+              </button>
+              <div class="cooldown-text" id="cd-quiz-${q.id}"></div>
             </div>
           `;
         } else {
@@ -941,6 +964,31 @@
         }
         quizContainer.appendChild(card);
       });
+      updateCooldownsUI();
+    }
+
+    function updateCooldownsUI() {
+      const now = Date.now();
+      quizy.forEach(q => {
+        let cooldownEnd = userStats.cooldowns[q.id] || 0;
+        let timeLeft = cooldownEnd - now;
+        let btn = document.getElementById(`btn-quiz-${q.id}`);
+        let cdText = document.getElementById(`cd-quiz-${q.id}`);
+
+        if (btn && cdText) {
+          if (timeLeft > 0) {
+            let minutes = Math.floor(timeLeft / 60000);
+            let seconds = Math.floor((timeLeft % 60000) / 1000);
+            cdText.textContent = `Następna próba za: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            btn.disabled = true;
+            btn.textContent = 'Zablokowany';
+          } else {
+            cdText.textContent = '';
+            btn.disabled = false;
+            btn.textContent = 'Zagraj';
+          }
+        }
+      });
     }
 
     let currentQuiz = null;
@@ -948,6 +996,12 @@
     let correctAnswersCount = 0;
 
     window.startQuiz = function(id) {
+      const now = Date.now();
+      if (userStats.cooldowns[id] && now < userStats.cooldowns[id]) {
+        alert('Ten quiz ma jeszcze cooldown!');
+        return;
+      }
+
       currentQuiz = quizy.find(q => q.id === id);
       if (!currentQuiz || currentQuiz.questions.length === 0) return;
       currentQIndex = 0;
@@ -979,12 +1033,17 @@
         userStats.points += earnedPoints;
         userStats.completedQuizzes++;
         
+        // Ustawienie 5 minut cooldownu (5 * 60 * 1000 ms)
+        userStats.cooldowns[currentQuiz.id] = Date.now() + (5 * 60 * 1000);
+        
         saveUserData();
+        renderQuizzes();
 
         quizGameBody.innerHTML = `
           <h2 style="color:#dc2626; margin-bottom:15px;">Koniec Quizu!</h2>
           <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Poprawne odpowiedzi: ${correctAnswersCount} / ${currentQuiz.questions.length}</p>
           <p style="font-size: 20px; font-weight: bold; color: #16a34a; margin-bottom: 20px;">Zdobyte punkty: +${earnedPoints} pkt (Razem: ${userStats.points})</p>
+          <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Kolejne podejście do tego quizu będzie możliwe za 5 minut.</p>
           <button class="btn" onclick="document.getElementById('quiz-modal-overlay').style.display='none'">Zamknij</button>
         `;
       }
