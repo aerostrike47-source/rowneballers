@@ -20,33 +20,71 @@
       flex-direction: column;
     }
 
-    /* LOGOWANIE / ENTER */
+    /* SYSTEM LOGOWANIA / REJESTRACJI (AKOD) */
+    .auth-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
     .auth-container {
-      max-width: 400px;
-      margin: auto;
+      max-width: 420px;
       background: #ffffff;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      width: 90%;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+      width: 100%;
       border-top: 5px solid #dc2626;
+      text-align: center;
     }
 
     .auth-container h2 {
-      text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       color: #dc2626;
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .auth-tab {
+      flex: 1;
+      padding: 10px;
+      background: none;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      color: #64748b;
+      transition: color 0.2s;
+    }
+
+    .auth-tab.active {
+      color: #dc2626;
+      border-bottom: 3px solid #dc2626;
+      margin-bottom: -2px;
     }
 
     .form-group {
       margin-bottom: 15px;
+      text-align: left;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-size: 14px;
       color: #475569;
+      font-weight: 600;
     }
 
     .form-group input {
@@ -79,6 +117,21 @@
 
     .btn:hover {
       background: #b91c1c;
+    }
+
+    .auth-form-section {
+      display: none;
+    }
+
+    .auth-form-section.active {
+      display: block;
+    }
+
+    .auth-error {
+      color: #dc2626;
+      font-size: 13px;
+      margin-bottom: 15px;
+      font-weight: 600;
     }
 
     /* NAWIGACJA */
@@ -401,18 +454,41 @@
 </head>
 <body>
 
-  <!-- EKRAN ENTER / NICK -->
-  <div id="auth-screen" style="display: flex; min-height: 100vh; width: 100%;">
+  <!-- OKNO LOGOWANIA / REJESTRACJI Z 4-CYFROWYM KODEM -->
+  <div id="auth-overlay" class="auth-overlay" style="display: none;">
     <div class="auth-container">
-      <h2>Wpisz swój Nick</h2>
-      <div id="error-message" style="color: #dc2626; font-size: 13px; margin-bottom: 15px; text-align: center;"></div>
-      
-      <form id="nick-form">
+      <h2 id="auth-title">Zaloguj się</h2>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Logowanie</button>
+        <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Załóż konto</button>
+      </div>
+
+      <div id="auth-error" class="auth-error"></div>
+
+      <!-- FORMULARZ LOGOWANIA -->
+      <form id="login-form" class="auth-form-section active" onsubmit="handleLogin(event)">
         <div class="form-group">
-          <label for="username">Twój nick do quizów:</label>
-          <input type="text" id="username" placeholder="np. Baller10" required>
+          <label>Nazwa użytkownika</label>
+          <input type="text" id="login-username" placeholder="Wpisz nick" required>
         </div>
-        <button type="submit" class="btn">Wejdź na stronę</button>
+        <div class="form-group">
+          <label>4-cyfrowy kod (PIN)</label>
+          <input type="password" id="login-code" maxlength="4" placeholder="np. 1234" required pattern="\d{4}">
+        </div>
+        <button type="submit" class="btn">Zaloguj się</button>
+      </form>
+
+      <!-- FORMULARZ REJESTRACJI -->
+      <form id="register-form" class="auth-form-section" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label>Nazwa użytkownika</label>
+          <input type="text" id="reg-username" placeholder="Wpisz unikalny nick" required>
+        </div>
+        <div class="form-group">
+          <label>4-cyfrowy kod (PIN)</label>
+          <input type="password" id="reg-code" maxlength="4" placeholder="np. 1234" required pattern="\d{4}">
+        </div>
+        <button type="submit" class="btn">Stwórz konto</button>
       </form>
     </div>
   </div>
@@ -470,7 +546,7 @@
         <label>Wybierz zdjęcie profilowe z dysku:</label>
         <input type="file" id="avatar-file-input" accept="image/*">
       </div>
-      <button class="btn" id="change-nick-btn" style="background: #64748b; margin-top: 10px;">Wyloguj / Zmień nick</button>
+      <button class="btn" id="logout-btn" style="background: #64748b; margin-top: 10px;" onclick="logout()">Wyloguj się</button>
     </div>
   </div>
 
@@ -506,12 +582,11 @@
   </div>
 
   <script>
-    const authScreen = document.getElementById('auth-screen');
+    const authOverlay = document.getElementById('auth-overlay');
     const appContent = document.getElementById('app-content');
     const welcomeScreen = document.getElementById('welcome-screen');
     const dashboardScreen = document.getElementById('dashboard-screen');
     
-    const nickForm = document.getElementById('nick-form');
     const userDisplayName = document.getElementById('user-display-name');
     const navAvatar = document.getElementById('nav-avatar');
     
@@ -524,7 +599,6 @@
     const profileCompleted = document.getElementById('profile-completed');
     const profileAvatarPreview = document.getElementById('profile-avatar-preview');
     const avatarFileInput = document.getElementById('avatar-file-input');
-    const changeNickBtn = document.getElementById('change-nick-btn');
 
     const goToDashboardBtn = document.getElementById('go-to-dashboard-btn');
     const backToHomeBtn = document.getElementById('back-to-home-btn');
@@ -541,15 +615,124 @@
     const questionsContainer = document.getElementById('questions-container');
     const addQuestionBtn = document.getElementById('add-question-btn');
     const quizContainer = document.getElementById('quiz-container');
+    const authError = document.getElementById('auth-error');
 
+    let currentUser = null;
     let userStats = {
       nick: '',
+      code: '',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop',
       points: 0,
       completedQuizzes: 0
     };
 
-    // 8 QUIZÓW Z DEDYKOWANYMI GRAFIKAMI I OFICJALNYMI MOTYWAMI
+    // SPRAWDZENIE SESJI PRZY STARCIE
+    window.addEventListener('DOMContentLoaded', () => {
+      const activeUserNick = localStorage.getItem('rowneballer_active_user');
+      if (activeUserNick) {
+        loadUser(activeUserNick);
+      } else {
+        authOverlay.style.display = 'flex';
+      }
+    });
+
+    function switchTab(tab) {
+      authError.textContent = '';
+      document.getElementById('tab-login').classList.remove('active');
+      document.getElementById('tab-register').classList.remove('active');
+      document.getElementById('login-form').classList.remove('active');
+      document.getElementById('register-form').classList.remove('active');
+
+      if (tab === 'login') {
+        document.getElementById('tab-login').classList.add('active');
+        document.getElementById('login-form').classList.add('active');
+        document.getElementById('auth-title').textContent = 'Zaloguj się';
+      } else {
+        document.getElementById('tab-register').classList.add('active');
+        document.getElementById('register-form').classList.add('active');
+        document.getElementById('auth-title').textContent = 'Załóż konto';
+      }
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const nick = document.getElementById('reg-username').value.trim();
+      const code = document.getElementById('reg-code').value.trim();
+
+      if (code.length !== 4 || isNaN(code)) {
+        authError.textContent = 'Kod musi składać się z dokładnie 4 cyfr!';
+        return;
+      }
+
+      let users = JSON.parse(localStorage.getItem('rowneballer_users') || '{}');
+      if (users[nick]) {
+        authError.textContent = 'Taki użytkownik już istnieje! Zmień nick lub zaloguj się.';
+        return;
+      }
+
+      // Tworzenie nowego konta
+      const newUser = {
+        nick: nick,
+        code: code,
+        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop',
+        points: 0,
+        completedQuizzes: 0
+      };
+
+      users[nick] = newUser;
+      localStorage.setItem('rowneballer_users', JSON.stringify(users));
+      localStorage.setItem('rowneballer_active_user', nick);
+      
+      loadUser(nick);
+      authOverlay.style.display = 'none';
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const nick = document.getElementById('login-username').value.trim();
+      const code = document.getElementById('login-code').value.trim();
+
+      let users = JSON.parse(localStorage.getItem('rowneballer_users') || '{}');
+      if (!users[nick]) {
+        authError.textContent = 'Nie znaleziono takiego użytkownika!';
+        return;
+      }
+
+      if (users[nick].code !== code) {
+        authError.textContent = 'Błędny 4-cyfrowy kod (PIN)!';
+        return;
+      }
+
+      localStorage.setItem('rowneballer_active_user', nick);
+      loadUser(nick);
+      authOverlay.style.display = 'none';
+    }
+
+    function loadUser(nick) {
+      let users = JSON.parse(localStorage.getItem('rowneballer_users') || '{}');
+      if (users[nick]) {
+        userStats = users[nick];
+        userDisplayName.textContent = userStats.nick;
+        navAvatar.src = userStats.avatar;
+        appContent.style.display = 'flex';
+        renderQuizzes();
+      }
+    }
+
+    function saveUserData() {
+      let users = JSON.parse(localStorage.getItem('rowneballer_users') || '{}');
+      if (userStats.nick) {
+        users[userStats.nick] = userStats;
+        localStorage.setItem('rowneballer_users', JSON.stringify(users));
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('rowneballer_active_user');
+      location.reload();
+    }
+
+    // 8 QUIZÓW
     let quizy = [
       {
         id: 1,
@@ -562,7 +745,7 @@
           { question: "5. Kto wpadał do basenu?", options: ["A. rafi | romun", "B. pomi | romun", "C. juri | rafi", "D. dymek | pomi"], correct: 1 }
         ],
         active: true,
-        img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&auto=format&fit=crop" // TikTok / Social media vibe
+        img: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=500&auto=format&fit=crop"
       },
       {
         id: 2,
@@ -575,7 +758,7 @@
           { question: "5. Kto jako pierwszy bramkarz wygrał Złotą Piłkę?", options: ["A. Gianluigi Buffon", "B. Manuel Neuer", "C. Lew Jaszyn", "D. Iker Casillas"], correct: 2 }
         ],
         active: true,
-        img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop" // Złota piłka / Trofeum
+        img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500&auto=format&fit=crop"
       },
       {
         id: 3,
@@ -588,7 +771,7 @@
           { question: "5. W jakim kraju odbył się pierwszy finał w historii?", options: ["A. Anglia", "B. Francja", "C. Włochy", "D. Hiszpania"], correct: 1 }
         ],
         active: true,
-        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop" // Stadion / Klimat UCL
+        img: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=500&auto=format&fit=crop"
       },
       {
         id: 4,
@@ -601,7 +784,7 @@
           { question: "5. Gdzie odbył się mundial w 2006 roku?", options: ["A. Korea i Japonia", "B. Niemcy", "C. RPA", "D. Brazylia"], correct: 1 }
         ],
         active: true,
-        img: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop" // Puchar Świata / Globalny futbol
+        img: "https://images.unsplash.com/photo-1569074187119-c87815b476da?w=500&auto=format&fit=crop"
       },
       {
         id: 5,
@@ -614,7 +797,7 @@
           { question: "5. Kto zdobył bramkę ręką („Ręka Boga”) na MŚ 1986?", options: ["A. Pelé", "B. Diego Maradona", "C. Zinedine Zidane", "D. Ronaldo"], correct: 1 }
         ],
         active: true,
-        img: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop" // Sylwetka piłkarza
+        img: "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=500&auto=format&fit=crop"
       },
       {
         id: 6,
@@ -627,7 +810,7 @@
           { question: "5. Która marka ubrała reprezentację Polski na MŚ 1974?", options: ["A. Adidas", "B. Nike", "C. Puma", "D. Le Coq Sportif"], correct: 2 }
         ],
         active: true,
-        img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop" // Buty sportowe / Marki
+        img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop"
       },
       {
         id: 7,
@@ -640,7 +823,7 @@
           { question: "5. Z jakiego kraju pochodzi liga La Liga?", options: ["A. Portugalia", "B. Hiszpania", "C. Brazylia", "D. Meksyk"], correct: 1 }
         ],
         active: true,
-        img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop" // Herb / Piłka ligowa
+        img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=500&auto=format&fit=crop"
       },
       {
         id: 8,
@@ -653,43 +836,9 @@
           { question: "5. W którym mieście gra klub Paris Saint-Germain (PSG)?", options: ["A. Marsylia", "B. Lyon", "C. Paryż", "D. Monako"], correct: 2 }
         ],
         active: true,
-        img: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop" // Kluby / Herb
+        img: "https://images.unsplash.com/photo-1518091043644-c1d4457512c6?w=500&auto=format&fit=crop"
       }
     ];
-
-    const savedNick = localStorage.getItem('rowneballer_nick');
-    const savedAvatar = localStorage.getItem('rowneballer_avatar');
-    const savedPoints = localStorage.getItem('rowneballer_points');
-    const savedCompleted = localStorage.getItem('rowneballer_completed');
-
-    if (savedNick) {
-      userStats.nick = savedNick;
-      if (savedAvatar) userStats.avatar = savedAvatar;
-      if (savedPoints) userStats.points = parseInt(savedPoints);
-      if (savedCompleted) userStats.completedQuizzes = parseInt(savedCompleted);
-      showApp(userStats.nick);
-    }
-
-    nickForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const username = document.getElementById('username').value.trim();
-      if (username) {
-        userStats.nick = username;
-        localStorage.setItem('rowneballer_nick', username);
-        localStorage.setItem('rowneballer_avatar', userStats.avatar);
-        localStorage.setItem('rowneballer_points', userStats.points);
-        localStorage.setItem('rowneballer_completed', userStats.completedQuizzes);
-        showApp(username);
-      }
-    });
-
-    function showApp(nick) {
-      userDisplayName.textContent = nick;
-      navAvatar.src = userStats.avatar;
-      authScreen.style.display = 'none';
-      appContent.style.display = 'flex';
-      renderQuizzes();
-    }
 
     openProfileBtn.addEventListener('click', () => {
       profileNick.textContent = userStats.nick;
@@ -709,9 +858,9 @@
         reader.onload = function(event) {
           const base64Image = event.target.result;
           userStats.avatar = base64Image;
-          localStorage.setItem('rowneballer_avatar', base64Image);
           navAvatar.src = base64Image;
           profileAvatarPreview.src = base64Image;
+          saveUserData();
           alert('Zdjęcie profilowe zostało zmienione!');
         };
         reader.readAsDataURL(file);
@@ -735,11 +884,6 @@
 
     closeModalBtn.addEventListener('click', () => modalOverlay.style.display = 'none');
     closeQuizModalBtn.addEventListener('click', () => quizModalOverlay.style.display = 'none');
-
-    changeNickBtn.addEventListener('click', () => {
-      localStorage.clear();
-      location.reload();
-    });
 
     function initQuestionsForm() {
       questionsContainer.innerHTML = '';
@@ -835,8 +979,7 @@
         userStats.points += earnedPoints;
         userStats.completedQuizzes++;
         
-        localStorage.setItem('rowneballer_points', userStats.points);
-        localStorage.setItem('rowneballer_completed', userStats.completedQuizzes);
+        saveUserData();
 
         quizGameBody.innerHTML = `
           <h2 style="color:#dc2626; margin-bottom:15px;">Koniec Quizu!</h2>
